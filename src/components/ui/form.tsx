@@ -1,0 +1,88 @@
+import * as React from "react";
+import { cn } from "@/lib/utils";
+
+export function Label({ className, ...props }: React.LabelHTMLAttributes<HTMLLabelElement>) {
+  return (
+    <label
+      className={cn("mb-1.5 block text-sm font-medium text-ink-800", className)}
+      {...props}
+    />
+  );
+}
+
+export function Input({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <input
+      className={cn(
+        "h-11 w-full rounded-xl border border-ink-200 bg-white px-3.5 text-sm text-ink-900",
+        "placeholder:text-ink-400 hover:border-ink-300 focus:border-brand-500 focus:outline-none",
+        "focus:ring-2 focus:ring-brand-500/20 disabled:bg-ink-100 disabled:text-ink-400",
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+export function Textarea({ className, ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  return (
+    <textarea
+      className={cn(
+        "w-full rounded-xl border border-ink-200 bg-white px-3.5 py-2.5 text-sm text-ink-900",
+        "placeholder:text-ink-400 hover:border-ink-300 focus:border-brand-500 focus:outline-none",
+        "focus:ring-2 focus:ring-brand-500/20 disabled:bg-ink-100 disabled:text-ink-400",
+        "min-h-[96px]",
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+export function Select({ className, children, ...props }: React.SelectHTMLAttributes<HTMLSelectElement>) {
+  return (
+    <select
+      className={cn(
+        "h-11 w-full appearance-none rounded-xl border border-ink-200 bg-white px-3.5 pr-9 text-sm text-ink-900",
+        "bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%235f708d%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.75rem_center] bg-no-repeat",
+        "hover:border-ink-300 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20",
+        "disabled:bg-ink-100 disabled:text-ink-400",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </select>
+  );
+}
+
+export function FieldError({ message }: { message?: string }) {
+  if (!message) return null;
+  return (
+    <p role="alert" className="mt-1.5 text-xs font-medium text-red-600">
+      {message}
+    </p>
+  );
+}
+
+export function FormMessage({
+  variant,
+  children,
+}: {
+  variant: "error" | "success" | "info";
+  children: React.ReactNode;
+}) {
+  const styles = {
+    error: "border-red-200 bg-red-50 text-red-800",
+    success: "border-emerald-200 bg-emerald-50 text-emerald-800",
+    info: "border-brand-200 bg-brand-50 text-brand-800",
+  } as const;
+  return (
+    <div
+      role={variant === "error" ? "alert" : "status"}
+      className={cn("rounded-xl border px-4 py-3 text-sm font-medium", styles[variant])}
+    >
+      {children}
+    </div>
+  );
+}
