@@ -7,7 +7,6 @@ import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { STUDENT_NAV as NAV } from "@/components/dashboard/nav";
 import { SetupPanel } from "@/components/dashboard/setup-panel";
 import { Badge, EmptyState } from "@/components/ui/badge";
-import { SessionActions } from "@/components/dashboard/session-actions";
 import { Avatar } from "@/components/avatar";
 import { timeHM } from "@/lib/utils";
 import { CalendarClock, Video } from "lucide-react";
@@ -56,7 +55,9 @@ export default async function StudentSessionsPage() {
     >
       <div className="mb-6">
         <h1 className="text-2xl font-extrabold text-ink-950">Sesi Saya</h1>
-        <p className="mt-1 text-sm text-ink-500">Mulai dan selesaikan sesi konsultasi di sini.</p>
+        <p className="mt-1 text-sm text-ink-500">
+          Lihat jadwal dan link meeting sesi konsultasimu.
+        </p>
       </div>
 
       {!configured && <SetupPanel />}
@@ -118,9 +119,9 @@ export default async function StudentSessionsPage() {
               </div>
 
               {b.session && b.session.status !== "completed" && (
-                <div className="mt-3">
-                  <SessionActions bookingId={b.id} />
-                </div>
+                <p className="mt-3 text-xs text-ink-400">
+                  Sesi dikelola oleh mentor — setelah dimulai, kamu bisa mengakses link meeting di atas.
+                </p>
               )}
             </li>
           ))}

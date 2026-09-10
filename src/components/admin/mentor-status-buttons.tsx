@@ -2,7 +2,11 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { approveMentorAction, rejectMentorAction } from "@/services/admin-actions";
+import {
+  approveMentorAction,
+  rejectMentorAction,
+  resetMentorStatusAction,
+} from "@/services/admin-actions";
 
 export function MentorStatusButtons({
   mentorId,
@@ -15,11 +19,15 @@ export function MentorStatusButtons({
   const [error, setError] = useState("");
   const [pending, startTransition] = useTransition();
 
-  function act(action: "approve" | "reject") {
+  function act(action: "approve" | "reject" | "reset") {
     setError("");
     startTransition(async () => {
-      const fn = action === "approve" ? approveMentorAction : rejectMentorAction;
-      const res = await fn(mentorId);
+      const res =
+        action === "approve"
+          ? await approveMentorAction(mentorId)
+          : action === "reject"
+            ? await rejectMentorAction(mentorId)
+            : await resetMentorStatusAction(mentorId, "pending");
       if (!res.ok) setError(res.error ?? "Gagal memperbarui status.");
       else router.refresh();
     });
@@ -36,7 +44,7 @@ export function MentorStatusButtons({
       </button>
       {status === "rejected" ? (
         <button
-          onClick={() => act("approve")}
+          onClick={() => act("reset")}
           disabled={pending}
           className="rounded-lg border border-ink-200 px-4 py-2 text-xs font-bold text-ink-600 hover:bg-ink-50 disabled:opacity-50"
         >

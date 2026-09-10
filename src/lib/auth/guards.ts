@@ -34,7 +34,10 @@ export async function requireRole(
 ) {
   const ctx = await requireUser(supabase);
   if (!ctx.profile || ctx.profile.role !== role) {
-    const fallback = ctx.profile ? `/${ctx.profile.role}/dashboard` : "/login";
+    // If a signed-in user has NO profile row (trigger edge case) send them to
+    // the landing page instead of /login — redirecting back to /login would
+    // create an infinite redirect loop for a logged-in user.
+    const fallback = ctx.profile ? `/${ctx.profile.role}/dashboard` : "/";
     redirect(fallback);
   }
   return ctx;

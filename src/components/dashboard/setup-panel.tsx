@@ -37,7 +37,9 @@ export function SetupPanel() {
           Untuk pengujian cepat: nonaktifkan email confirmation di Authentication → Providers → Email,
           dan set role admin pada akun pertama lewat SQL Editor:
           <code className="mt-2 block rounded bg-ink-800 px-3 py-2 text-[11px] text-white">
-            update public.profiles set role = &apos;admin&apos; where email = &apos;admin@mentora.id&apos;;
+            update public.profiles set role = &apos;admin&apos;
+            <br />
+            where id = (select id from auth.users where email = &apos;admin@mentora.id&apos;);
           </code>
         </p>
       </div>

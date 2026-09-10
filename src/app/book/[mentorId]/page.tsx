@@ -4,7 +4,6 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { requireStudent } from "@/lib/auth/guards";
 import { getMentorListItem } from "@/services/mentor.service";
-import { getSubjects } from "@/services/catalog.service";
 import { BookingForm } from "@/components/booking/booking-form";
 import { EmptyState } from "@/components/ui/badge";
 import { SearchX } from "lucide-react";
@@ -38,15 +37,11 @@ export default async function BookPage({
   if (!user) redirect("/login");
 
   let mentor = null;
-  let subjects = [] as Awaited<ReturnType<typeof getSubjects>>;
   let error: string | null = null;
 
   if (configured && supabase) {
     try {
-      [mentor, subjects] = await Promise.all([
-        getMentorListItem(supabase, mentorId),
-        getSubjects(supabase),
-      ]);
+      mentor = await getMentorListItem(supabase, mentorId);
     } catch (e) {
       error = e instanceof Error ? e.message : "Gagal memuat data.";
     }
@@ -82,8 +77,12 @@ export default async function BookPage({
           )}
           <BookingForm
             mentor={mentor}
-            subjects={subjects}
-            initialSubjectId={subject_id && subjects.some((s) => s.id === subject_id) ? subject_id : undefined}
+            // Only the subjects this mentor actually teaches (keeps the
+            // server-side subject-ownership validation in sync with the UI).
+            subjects={mentor.subjects}
+            initialSubjectId={
+              subject_id && mentor.subjects.some((s) => s.id === subject_id) ? subject_id : undefined
+            }
           />
         </>
       )}

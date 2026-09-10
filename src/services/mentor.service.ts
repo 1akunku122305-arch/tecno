@@ -33,6 +33,10 @@ export interface MentorPage {
   totalPages: number;
 }
 
+/** Shared embedded select so all mentor list-item queries stay in sync. */
+const MENTOR_LIST_SELECT =
+  "id, user_id, headline, bio, university, major, years_experience, price_per_session, status, category_id, profile:profiles!mentor_profiles_user_id_fkey(full_name, avatar_url)";
+
 /** Raw shape returned by PostgREST for the mentor_profiles query. */
 type MentorRow = {
   id: string;
@@ -59,10 +63,7 @@ export async function getMentorPage(
 
   let query = supabase
     .from("mentor_profiles")
-    .select(
-      "id, user_id, headline, bio, university, major, years_experience, price_per_session, status, category_id, profile:profiles!mentor_profiles_user_id_fkey(full_name, avatar_url)",
-      { count: "exact" }
-    )
+    .select(MENTOR_LIST_SELECT, { count: "exact" })
     .eq("status", "approved");
 
   if (filters.categoryId) query = query.eq("category_id", filters.categoryId);
@@ -71,8 +72,11 @@ export async function getMentorPage(
   if (filters.maxPrice !== undefined && filters.maxPrice !== null)
     query = query.lte("price_per_session", filters.maxPrice);
   if (filters.search) {
-    const ilike = `%${filters.search.trim()}%`;
-    query = query.or(`headline.ilike.${ilike},bio.ilike.${ilike},university.ilike.${ilike}`);
+    // Sanitise characters that would break the PostgREST `or=(...)` syntax.
+    const term = `%${filters.search.trim().replace(/[%(),."]/g, " ").replace(/\s+/g, " ")}%`;
+    query = query.or(
+      ["headline", "bio", "university"].map((c) => `${c}.ilike.${term}`).join(",")
+    );
   }
 
   const { data, error, count } = await query
@@ -201,15 +205,31 @@ export async function getMentorListItem(
 ): Promise<MentorListItem | null> {
   const { data } = await supabase
     .from("mentor_profiles")
-    .select(
-      "id, user_id, headline, bio, university, major, years_experience, price_per_session, status, category_id, profile:profiles!mentor_profiles_user_id_fkey(full_name, avatar_url)"
-    )
+    .select(MENTOR_LIST_SELECT)
     .eq("id", mentorId)
     .maybeSingle();
 
   if (!data) return null;
   const [hydrated] = await hydrateMentors(supabase, [data as unknown as MentorRow]);
   return hydrated ?? null;
+}
+
+/**
+ * Batch fetch + hydrate mentors by id (single round-trip + shared hydration
+ * queries). Used by booking dashboards to avoid N+1 per-booking lookups.
+ */
+export async function getMentorListItemsByIds(
+  supabase: SupabaseClient,
+  mentorIds: string[]
+): Promise<MentorListItem[]> {
+  const ids = [...new Set(mentorIds)];
+  if (ids.length === 0) return [];
+  const { data, error } = await supabase
+    .from("mentor_profiles")
+    .select(MENTOR_LIST_SELECT)
+    .in("id", ids);
+  if (error) throw new Error(`Gagal memuat mentor: ${error.message}`);
+  return hydrateMentors(supabase, (data ?? []) as unknown as MentorRow[]);
 }
 
 export type MentorDetailReview = Review & {

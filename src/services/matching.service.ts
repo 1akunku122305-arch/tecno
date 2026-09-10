@@ -22,10 +22,11 @@ export async function findMentorMatches(
 ): Promise<{ matches: MatchResult[]; total: number }> {
   const page = options.page ?? 1;
 
+  // NOTE: budget is intentionally NOT pre-filtered in the database here —
+  // out-of-budget mentors are still scored (linear falloff in budgetScore)
+  // so the budget dimension actually differentiates results.
   const { mentors, total } = await getMentorPage(supabase, {
     categoryId: criteria.category_id ?? undefined,
-    minPrice: criteria.budget_min ?? undefined,
-    maxPrice: criteria.budget_max ?? undefined,
     page,
     pageSize: 48,
   });

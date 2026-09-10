@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import type { MentorListItem, Subject } from "@/types";
+import type { MentorListItem } from "@/types";
 import { createBookingAction } from "@/services/booking-actions";
 import { Avatar } from "@/components/avatar";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,8 @@ export function BookingForm({
   initialSubjectId,
 }: {
   mentor: MentorListItem;
-  subjects: Subject[];
+  /** Subjects taught by this mentor (from the mentor profile, not the whole catalog). */
+  subjects: { id: string; name: string }[];
   initialSubjectId?: string;
 }) {
   const router = useRouter();

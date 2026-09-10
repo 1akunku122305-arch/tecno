@@ -62,9 +62,18 @@ export function dayName(dayOfWeek: number): string {
   return DAY_NAMES[dayOfWeek] ?? "-";
 }
 
-/** Today's date in YYYY-MM-DD (local time) */
+/**
+ * Today's date in YYYY-MM-DD using the app's fixed timezone (Asia/Jakarta).
+ * The app targets Indonesian users and stores naive date/time values, so we
+ * deliberately do NOT rely on the server's local timezone (Vercel = UTC).
+ */
 export function todayISO(): string {
-  return new Date().toISOString().slice(0, 10);
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Jakarta",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
 }
 
 /** Given day_of_week (0-6) return the next upcoming date >= today */
@@ -87,6 +96,22 @@ export function slugify(text: string): string {
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-");
+}
+
+/**
+ * Map PostgREST/Postgres error codes to friendly Indonesian messages.
+ * 42501  = row-level security policy violation (missing permission)
+ * PGRST116 = "no rows returned" (e.g. an update/delete matched nothing,
+ *            typically because RLS hid the row from the current user)
+ */
+export function friendlyDbError(
+  error: { code?: string; message: string },
+  fallback: string
+): Error {
+  if (error.code === "42501")
+    return new Error("Aksi ditolak: kamu tidak memiliki izin untuk data ini.");
+  if (error.code === "PGRST116") return new Error(fallback);
+  return new Error(error.message);
 }
 
 /** Indonesian status labels */

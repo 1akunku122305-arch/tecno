@@ -15,17 +15,19 @@ export function MeetingUrlForm({
 }) {
   const router = useRouter();
   const [url, setUrl] = useState(initialUrl ?? "");
-  const [msg, setMsg] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [pending, startTransition] = useTransition();
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    setMsg("");
+    setError("");
+    setSuccess("");
     startTransition(async () => {
       const res = await updateMeetingUrlAction(bookingId, url);
-      if (!res.ok) setMsg(res.error ?? "Gagal menyimpan.");
+      if (!res.ok) setError(res.error ?? "Gagal menyimpan.");
       else {
-        setMsg("Link meeting tersimpan.");
+        setSuccess("Link meeting tersimpan.");
         router.refresh();
       }
     });
@@ -42,7 +44,10 @@ export function MeetingUrlForm({
           placeholder="https://meet.google.com/…"
           type="url"
         />
-        {msg && <p className="mt-1.5 text-xs font-medium text-emerald-600">{msg}</p>}
+        {error && <p className="mt-1.5 text-xs font-medium text-red-600">{error}</p>}
+        {success && !error && (
+          <p className="mt-1.5 text-xs font-medium text-emerald-600">{success}</p>
+        )}
       </div>
       <Button type="submit" size="sm" loading={pending}>Simpan</Button>
     </form>

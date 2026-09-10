@@ -63,7 +63,7 @@ export function ProfileForm({
     setError("");
     setSuccess("");
     startTransition(async () => {
-      const res = await uploadAvatarAction(file);
+      const res = await uploadAvatarAction(file, avatar);
       if (!res.ok) setError(res.error ?? "Gagal mengunggah foto.");
       else {
         setAvatar(res.url ?? null);
