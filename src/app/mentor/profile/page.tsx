@@ -7,6 +7,7 @@ import { MENTOR_NAV as NAV } from "@/components/dashboard/nav";
 import { SetupPanel } from "@/components/dashboard/setup-panel";
 import { ProfileForm } from "@/components/profile/profile-form";
 import { MentorProfileEditor } from "@/components/mentor/mentor-profile-editor";
+import { MissingMentorProfile } from "@/components/mentor/missing-mentor-profile";
 
 export const metadata: Metadata = { title: "Profil Mentor" };
 export const dynamic = "force-dynamic";
