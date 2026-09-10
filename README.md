@@ -321,7 +321,12 @@ where id = (select id from auth.users where email = 'admin@mentora.id');
 9. Menghapus kategori akan menghapus mata kuliah & relasi mentor terkait
    (cascade) — gunakan "Nonaktifkan" bila ragu.
 10. Jika UI menampilkan "Supabase belum dikonfigurasi", berarti env vars belum
-    diisi — bukan bug.
+    diisi (atau `npm run dev` belum di-restart setelah mengisi `.env.local`) — bukan bug.
+11. **Profil mentor kosong / tombol verifikasi berputar-putar**: akun ber-role
+    `mentor` tetapi baris `mentor_profiles`-nya belum ada (mis. role diberikan
+    lewat SQL langsung, atau akun daftar sebelum migration dijalankan). Solusi:
+    buka `/mentor/profile` lalu klik **Buat Profil Mentor** — atau lewat SQL:
+    `insert into public.mentor_profiles (user_id) values ('<uid>') on conflict do nothing;`
 
 ---
 

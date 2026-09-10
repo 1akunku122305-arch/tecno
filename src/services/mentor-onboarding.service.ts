@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type { MentorStatus } from "@/types";
 import { friendlyDbError, slugify } from "@/lib/utils";
 
@@ -13,6 +14,65 @@ import { friendlyDbError, slugify } from "@/lib/utils";
 export interface ActionResponse {
   ok: boolean;
   error?: string;
+}
+
+type OwnMentor = { id: string; status: MentorStatus; price_per_session: number };
+
+/**
+ * Get the current user's mentor_profiles row, creating it when missing.
+ *
+ * A mentor-role account can exist WITHOUT a mentor_profiles row when the role
+ * was granted via raw SQL (the handle_new_user trigger only fires on
+ * auth.users INSERT) or the account registered before the migration ran.
+ * Auto-creating keeps the onboarding flow self-healing instead of failing
+ * with a confusing "Profil mentor tidak ditemukan" error.
+ */
+async function requireOwnMentor(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<OwnMentor> {
+  const { data: existing } = await supabase
+    .from("mentor_profiles")
+    .select("id, status, price_per_session")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (existing) return existing as OwnMentor;
+
+  const { data: created, error } = await supabase
+    .from("mentor_profiles")
+    .insert({ user_id: userId, status: "pending" })
+    .select("id, status, price_per_session")
+    .single();
+  if (error || !created) {
+    throw new Error(
+      "Profil mentor belum ada dan gagal dibuat otomatis. " +
+        "Pastikan akun ini ber-role mentor, lalu coba lagi."
+    );
+  }
+  return created as OwnMentor;
+}
+
+/**
+ * Explicit "Buat Profil Mentor" action for the profile page empty state.
+ * Idempotent: returns ok when the row already exists.
+ */
+export async function ensureMentorProfile(): Promise<ActionResponse> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Silakan login terlebih dahulu." };
+
+  try {
+    await requireOwnMentor(supabase, user.id);
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Gagal membuat profil mentor." };
+  }
+
+  revalidatePath("/mentor/profile");
+  revalidatePath("/mentor/dashboard");
+  revalidatePath("/mentor/schedule");
+  return { ok: true };
 }
 
 export interface MentorProfileInput {
@@ -51,7 +111,7 @@ export async function saveMentorProfile(input: MentorProfileInput): Promise<Acti
     meeting_url: input.meetingUrl?.trim() || null,
   };
 
-  const { error } = await supabase.from("mentor_profiles").update(patch).eq("id", existing.id);
+  const { error } = await supabase.from("mentor_profiles").update(patch).eq("id", mentor.id);
   if (error) return { ok: false, error: `Gagal menyimpan profil mentor: ${error.message}` };
 
   revalidatePath("/mentor/dashboard");

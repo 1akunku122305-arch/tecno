@@ -29,9 +29,13 @@ export function SetupPanel() {
             <code className="rounded bg-ink-100 px-1.5 py-0.5 text-xs">.env.local</code>
           </li>
           <li>
-            Buat storage bucket <code className="rounded bg-ink-100 px-1.5 py-0.5 text-xs">avatars</code> (public)
+            Bucket storage <code className="rounded bg-ink-100 px-1.5 py-0.5 text-xs">avatars</code> (public){" "}
+            sudah dibuat otomatis oleh migration — buat manual hanya jika belum ada
           </li>
-          <li>Restart <code className="rounded bg-ink-100 px-1.5 py-0.5 text-xs">npm run dev</code></li>
+          <li>
+            Restart <code className="rounded bg-ink-100 px-1.5 py-0.5 text-xs">npm run dev</code>{" "}
+            (wajib setiap mengubah <code className="rounded bg-ink-100 px-1.5 py-0.5 text-xs">.env.local</code>)
+          </li>
         </ol>
         <p className="mt-4 rounded-xl bg-ink-50 px-4 py-3 text-xs leading-relaxed text-ink-500">
           Untuk pengujian cepat: nonaktifkan email confirmation di Authentication → Providers → Email,
