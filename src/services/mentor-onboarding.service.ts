@@ -111,7 +111,7 @@ export async function saveMentorProfile(input: MentorProfileInput): Promise<Acti
     meeting_url: input.meetingUrl?.trim() || null,
   };
 
-  const { error } = await supabase.from("mentor_profiles").update(patch).eq("id", mentor.id);
+  const { error } = await supabase.from("mentor_profiles").update(patch).eq("id", existing.id);
   if (error) return { ok: false, error: `Gagal menyimpan profil mentor: ${error.message}` };
 
   revalidatePath("/mentor/dashboard");
