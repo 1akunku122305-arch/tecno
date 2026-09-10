@@ -191,7 +191,15 @@ export async function updateCategory(
   id: string,
   input: { name?: string; description?: string; icon?: string; isActive?: boolean }
 ) {
-  const { error } = await supabase.from("categories").update(input).eq("id", id).select("id");
+  const patch: Record<string, unknown> = {};
+  if (input.name !== undefined) patch.name = input.name;
+  if (input.description !== undefined) patch.description = input.description;
+  if (input.icon !== undefined) patch.icon = input.icon;
+  if (input.isActive !== undefined) patch.is_active = input.isActive;
+
+  if (Object.keys(patch).length === 0) return { ok: true };
+
+  const { error } = await supabase.from("categories").update(patch).eq("id", id).select("id");
   if (error) throw friendlyDbError(error, "Kategori tidak ditemukan atau tidak dapat diubah.");
   return { ok: true };
 }
@@ -232,11 +240,17 @@ export async function updateSubject(
   id: string,
   input: { name?: string; description?: string; isActive?: boolean; categoryId?: string }
 ) {
-  const patch: Record<string, unknown> = { ...input };
-  if (input.name) {
+  const patch: Record<string, unknown> = {};
+  if (input.name !== undefined) {
     patch.name = input.name.trim();
     patch.slug = slugify(input.name);
   }
+  if (input.description !== undefined) patch.description = input.description;
+  if (input.isActive !== undefined) patch.is_active = input.isActive;
+  if (input.categoryId !== undefined) patch.category_id = input.categoryId;
+
+  if (Object.keys(patch).length === 0) return { ok: true };
+
   const { error } = await supabase.from("subjects").update(patch).eq("id", id).select("id");
   if (error)
     throw friendlyDbError(error, "Mata kuliah tidak ditemukan atau tidak dapat diubah.");
