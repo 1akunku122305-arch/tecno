@@ -32,7 +32,8 @@ export async function updateProfileAction(
 }
 
 export async function uploadAvatarAction(
-  file: File
+  file: File,
+  previousAvatarUrl?: string | null
 ): Promise<{ ok: boolean; url?: string; error?: string }> {
   const supabase = await createClient();
   const {
@@ -43,6 +44,20 @@ export async function uploadAvatarAction(
   try {
     const url = await uploadAvatar(file, user.id);
     await updateProfile(supabase, user.id, { avatar_url: url });
+
+    // Best-effort: remove the previous avatar object (in the same bucket &
+    // the user's own folder) so the bucket doesn't accumulate old uploads.
+    if (previousAvatarUrl) {
+      const marker = `/avatars/public/${user.id}/`;
+      const idx = previousAvatarUrl.indexOf(marker);
+      if (idx !== -1) {
+        const oldPath = previousAvatarUrl.slice(idx + marker.length);
+        if (oldPath && !oldPath.includes("/")) {
+          await supabase.storage.from("avatars").remove([oldPath]);
+        }
+      }
+    }
+
     revalidatePath("/student/profile");
     revalidatePath("/mentor/profile");
     return { ok: true, url };

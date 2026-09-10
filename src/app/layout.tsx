@@ -1,9 +1,15 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
 
 // System font stack (see globals.css) — no network dependency at build time.
 // Keeps `npm run build` reliable in restricted networks and on Vercel.
+
+export const viewport: Viewport = {
+  themeColor: "#1b63f5",
+  width: "device-width",
+  initialScale: 1,
+};
 
 export const metadata: Metadata = {
   title: {

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { MentorStatus } from "@/types";
-import { slugify } from "@/lib/utils";
+import { friendlyDbError, slugify } from "@/lib/utils";
 
 // ---------------------------------------------------------------------------
 // Mentor profile writes (server actions). A mentor manages only their own
@@ -194,11 +194,16 @@ export async function deleteAvailability(availabilityId: string): Promise<Action
 
 export async function toggleAvailability(availabilityId: string, isAvailable: boolean): Promise<ActionResponse> {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Silakan login terlebih dahulu." };
+
   const { error } = await supabase
     .from("mentor_availability")
     .update({ is_available: !isAvailable })
-    .eq("id", availabilityId);
-  if (error) return { ok: false, error: `Gagal memperbarui jadwal: ${error.message}` };
+    .eq("id", availabilityId)
+    .select("id");
+  if (error)
+    return { ok: false, error: friendlyDbError(error, "Jadwal tidak ditemukan.").message };
   revalidatePath("/mentor/schedule");
   return { ok: true };
 }

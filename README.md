@@ -134,9 +134,17 @@ Enum: `user_role`, `mentor_status (pending/approved/rejected)`,
 - **Seed hanya data konfigurasi**: 5 kategori + 14 mata kuliah contoh.
   **Tidak ada** fake user, fake mentor, fake rating, fake booking, atau
   statistik palsu.
+- **Storage**: bucket `avatars` (public) dibuat otomatis + policy:
+  baca publik, tulis hanya ke folder milik sendiri (`{user_id}/…`).
 
 Cara menjalankan: Supabase Dashboard → SQL Editor → paste isi file → Run
 (atau `supabase db push` jika memakai Supabase CLI).
+
+> **Project yang sudah berjalan**: kalau file ini sudah pernah dijalankan
+> dan kamu menerapkan versi revisi, jalankan ulang bagian
+> *Row Level Security* (helper `is_*`, `drop policy`/`create policy`) dan
+> *Storage* di SQL Editor — policy `drop if exists` + `create or replace`
+> aman dijalankan ulang (idempotent).
 
 ---
 
@@ -144,22 +152,30 @@ Cara menjalankan: Supabase Dashboard → SQL Editor → paste isi file → Run
 
 Semua tabel `enable row level security`. Pola:
 
-- **profiles**: user hanya melihat/mengubah dirinya sendiri; admin semua.
+- **profiles**: user hanya melihat dirinya sendiri + profil peserta booking-nya
+  (helper `is_booking_participant`); user TIDAK bisa mengubah role sendiri
+  (helper `is_profile_role_unchanged`) dan insert sendiri hanya role
+  student/mentor; admin semua.
 - **categories/subjects/topics**: publik hanya membaca yang `is_active = true`;
   tulis hanya admin.
-- **mentor_profiles**: publik hanya melihat `approved`; mentor hanya
-  mengubah miliknya (dilarang mengubah status sendiri); admin semua.
+- **mentor_profiles**: publik hanya melihat `approved`; hanya akun ber-role
+  `mentor` yang boleh membuat profil mentor; mentor hanya mengubah miliknya
+  dan TIDAK BISA mengubah status sendiri (helper `is_mentor_status_unchanged`
+  — approve/reject khusus admin); admin semua.
 - **mentor_subjects / mentor_topics / mentor_availability**: seleksi hanya
   untuk mentor approved/pemilik/admin; tulis hanya pemilik/admin.
 - **bookings**: student membaca booking miliknya; mentor membaca booking
   yang berkaitan dengannya; insert hanya untuk student (ke mentor approved,
   subjek/topik wajib, harga = harga mentor); student hanya bisa men-`pending`/
-  `cancel`, mentor hanya `confirmed`/`rejected`/`completed`.
-- **sessions**: hanya partisipan (student/mentor terkait) atau admin.
+  `cancel`, mentor `confirmed`/`rejected`/`completed`.
+- **sessions**: baca = partisipan (student/mentor) atau admin; **update hanya
+  mentor/admin** (student tidak bisa mulai/selesaikan sesi atau mengganti
+  link meeting).
 - **reviews**: insert hanya oleh student pemilik booking dengan status
   `completed`; unique booking.
 - **payments**: baca hanya pemilik booking/mentor terkait/admin; insert student
-  pemilik booking.
+  pemilik booking **hanya status `pending` dengan amount = harga booking**
+  (tidak bisa membuat baris "paid" palsu).
 - **notifications**: hanya pemilik notifikasi.
 
 Helper `public.is_admin()` dan `public.is_mentor_owner()` (`security definer`)
@@ -205,8 +221,8 @@ database dan petunjuk setup yang jelas (tidak crash).
 1. Buat project di [supabase.com](https://supabase.com).
 2. Jalankan `supabase/migrations/20240101000000_init.sql` di **SQL Editor**.
 3. Salin **Project URL** + **anon key** ke `.env.local`.
-4. Buat **storage bucket** bernama `avatars` dengan akses **public**
-   (Storage → New bucket → name `avatars`, public). Dipakai upload foto profil.
+4. Storage bucket `avatars` **sudah dibuat otomatis** oleh migration (public,
+   policy tulis hanya folder milik sendiri) — tidak perlu setup manual.
 5. **Authentication → URL Configuration**: masukkan URL situs
    (`http://localhost:3000` lokal; URL Vercel untuk produksi) dan redirect
    URL termasuk `.../reset-password`.
@@ -292,8 +308,7 @@ where id = (select id from auth.users where email = 'admin@mentora.id');
 
 1. **Email confirmation aktif** → registrasi tidak langsung login; user perlu klik
    tautan email. Untuk prototype, matikan Confirm email (lihat §8.6).
-2. **Bucket `avatars` belum dibuat** → upload foto error "Bucket not found".
-3. **Role admin belum diset** → `/admin/*` mengalihkan ke dashboard sesuai role
+2. **Role admin belum diset** → `/admin/*` mengalihkan ke dashboard sesuai role
    akun (by design). Set lewat SQL (§8.7).
 4. **URL redirect Auth** salah → reset password/link konfirmasi tidak sampai ke
    halaman yang benar.

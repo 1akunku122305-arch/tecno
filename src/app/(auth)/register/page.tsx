@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Logo } from "@/components/logo";
 import { RegisterForm } from "./register-form";
 
@@ -12,7 +13,10 @@ export default function RegisterPage() {
         <h1 className="text-2xl font-bold text-ink-950">Buat akun Mentora</h1>
         <p className="mt-1 text-sm text-ink-500">Pilih peranmu dan mulai perjalanan akademikmu.</p>
       </div>
-      <RegisterForm />
+      {/* Suspense required because RegisterForm reads ?role=mentor via useSearchParams */}
+      <Suspense>
+        <RegisterForm />
+      </Suspense>
     </div>
   );
 }

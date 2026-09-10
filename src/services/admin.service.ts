@@ -1,6 +1,13 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Category, MentorStatus, Subject, UserRole } from "@/types";
-import { slugify } from "@/lib/utils";
+import { friendlyDbError, slugify } from "@/lib/utils";
+
+/** Human-readable message for FK violations (data still referenced elsewhere). */
+function fkBlockedError(action: string): Error {
+  return new Error(
+    `${action}: data masih terkait record lain (mis. booking atau relasi mentor). Nonaktifkan saja bila ragu.`
+  );
+}
 
 // ---------------------------------------------------------------------------
 // Admin service — every mutation is guarded by RLS (is_admin()).
@@ -107,8 +114,10 @@ export async function setMentorStatus(
   const { error } = await supabase
     .from("mentor_profiles")
     .update({ status })
-    .eq("id", mentorId);
-  if (error) throw new Error(`Gagal memperbarui status mentor: ${error.message}`);
+    .eq("id", mentorId)
+    .select("id");
+  if (error)
+    throw friendlyDbError(error, "Profil mentor tidak ditemukan atau tidak dapat diubah.");
   return { ok: true };
 }
 
@@ -118,11 +127,43 @@ export async function setUserRole(
   role: UserRole
 ) {
   if (role === "admin") throw new Error("Role admin tidak dapat diberikan melalui UI.");
+
+  const { data: existing, error: readError } = await supabase
+    .from("profiles")
+    .select("id, role")
+    .eq("id", userId)
+    .maybeSingle();
+  if (readError || !existing) throw new Error("Pengguna tidak ditemukan.");
+  if (existing.role === role) return { ok: true }; // no-op (jaga-jaga status reset)
+
   const { error } = await supabase
     .from("profiles")
     .update({ role })
-    .eq("id", userId);
-  if (error) throw new Error(`Gagal memperbarui peran: ${error.message}`);
+    .eq("id", userId)
+    .select("id");
+  if (error)
+    throw friendlyDbError(error, "Pengguna tidak ditemukan atau perannya tidak dapat diubah.");
+
+  // Keep mentor onboarding consistent after a role change:
+  //  - ...→ mentor: ensure a mentor_profiles row exists so the onboarding
+  //    page works immediately (trigger handle_new_user only creates it for
+  //    accounts that registered AS mentor).
+  //  - mentor→...: force re-verification so a demoted account doesn't keep
+  //    showing up publicly as an "approved" mentor.
+  if (role === "mentor") {
+    const { error: mpError } = await supabase
+      .from("mentor_profiles")
+      .upsert(
+        { user_id: userId, status: "pending" },
+        { onConflict: "user_id", ignoreDuplicates: true }
+      );
+    if (mpError) throw new Error(`Gagal menyiapkan profil mentor: ${mpError.message}`);
+  } else {
+    await supabase
+      .from("mentor_profiles")
+      .update({ status: "pending" })
+      .eq("user_id", userId);
+  }
   return { ok: true };
 }
 
@@ -150,14 +191,17 @@ export async function updateCategory(
   id: string,
   input: { name?: string; description?: string; icon?: string; isActive?: boolean }
 ) {
-  const { error } = await supabase.from("categories").update(input).eq("id", id);
-  if (error) throw new Error(`Gagal memperbarui kategori: ${error.message}`);
+  const { error } = await supabase.from("categories").update(input).eq("id", id).select("id");
+  if (error) throw friendlyDbError(error, "Kategori tidak ditemukan atau tidak dapat diubah.");
   return { ok: true };
 }
 
 export async function deleteCategory(supabase: SupabaseClient, id: string) {
-  const { error } = await supabase.from("categories").delete().eq("id", id);
-  if (error) throw new Error(`Gagal menghapus kategori: ${error.message}`);
+  const { error } = await supabase.from("categories").delete().eq("id", id).select("id");
+  if (error) {
+    if (error.code === "23503") throw fkBlockedError("Gagal menghapus kategori");
+    throw friendlyDbError(error, "Kategori tidak ditemukan atau tidak dapat dihapus.");
+  }
   return { ok: true };
 }
 
@@ -193,14 +237,18 @@ export async function updateSubject(
     patch.name = input.name.trim();
     patch.slug = slugify(input.name);
   }
-  const { error } = await supabase.from("subjects").update(patch).eq("id", id);
-  if (error) throw new Error(`Gagal memperbarui mata kuliah: ${error.message}`);
+  const { error } = await supabase.from("subjects").update(patch).eq("id", id).select("id");
+  if (error)
+    throw friendlyDbError(error, "Mata kuliah tidak ditemukan atau tidak dapat diubah.");
   return { ok: true };
 }
 
 export async function deleteSubject(supabase: SupabaseClient, id: string) {
-  const { error } = await supabase.from("subjects").delete().eq("id", id);
-  if (error) throw new Error(`Gagal menghapus mata kuliah: ${error.message}`);
+  const { error } = await supabase.from("subjects").delete().eq("id", id).select("id");
+  if (error) {
+    if (error.code === "23503") throw fkBlockedError("Gagal menghapus mata kuliah");
+    throw friendlyDbError(error, "Mata kuliah tidak ditemukan atau tidak dapat dihapus.");
+  }
   return { ok: true };
 }
 

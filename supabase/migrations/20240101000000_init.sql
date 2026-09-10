@@ -499,6 +499,44 @@ as $$
   );
 $$;
 
+-- ---- helper: is the current user in a booking relationship with a profile? -
+-- Used so mentors/students only see the minimal profile info of the people
+-- they actually booked with (not every profile in the system).
+create or replace function public.is_booking_participant(profile_id uuid)
+returns boolean
+language sql stable security definer set search_path = public
+as $$
+  select exists (
+    select 1 from public.bookings b
+    where (b.student_id = profile_id
+           or exists (select 1 from public.mentor_profiles m
+                      where m.user_id = profile_id and m.id = b.mentor_id))
+      and (b.student_id = auth.uid()
+           or exists (select 1 from public.mentor_profiles m2
+                      where m2.user_id = auth.uid() and m2.id = b.mentor_id))
+  );
+$$;
+
+-- ---- helper: no self-elevation — new role must equal the stored role -------
+create or replace function public.is_profile_role_unchanged(profile_id uuid, new_role public.user_role)
+returns boolean
+language sql stable security definer set search_path = public
+as $$
+  select exists (
+    select 1 from public.profiles p where p.id = profile_id and p.role = new_role
+  );
+$$;
+
+-- ---- helper: mentors cannot change their own verification status -----------
+create or replace function public.is_mentor_status_unchanged(mentor_id uuid, new_status public.mentor_status)
+returns boolean
+language sql stable security definer set search_path = public
+as $$
+  select exists (
+    select 1 from public.mentor_profiles m where m.id = mentor_id and m.status = new_status
+  );
+$$;
+
 -- ============================================================================
 -- PROFILES
 -- ============================================================================
@@ -515,15 +553,17 @@ create policy "profiles_select_users_public" on public.profiles
          or exists (select 1 from public.mentor_profiles m where m.user_id = auth.uid()));
 
 drop policy if exists "profiles_insert_own" on public.profiles;
+-- Self-insert never allows 'admin' (admins are granted explicitly in SQL).
 create policy "profiles_insert_own" on public.profiles
   for insert to authenticated
-  with check (id = auth.uid());
+  with check (id = auth.uid() and role in ('student', 'mentor'));
 
 drop policy if exists "profiles_update_own" on public.profiles;
+-- Users can update their own profile but NOT their own role (no self-elevation).
 create policy "profiles_update_own" on public.profiles
   for update to authenticated
   using (id = auth.uid())
-  with check (id = auth.uid());
+  with check (id = auth.uid() and public.is_profile_role_unchanged(id, role));
 
 drop policy if exists "profiles_update_admin" on public.profiles;
 create policy "profiles_update_admin" on public.profiles
@@ -586,15 +626,20 @@ create policy "mentor_profiles_select_approved" on public.mentor_profiles
   using (status = 'approved' or user_id = auth.uid() or public.is_admin());
 
 drop policy if exists "mentor_profiles_insert_own" on public.mentor_profiles;
+-- Only accounts with profile role 'mentor' may create a mentor profile.
 create policy "mentor_profiles_insert_own" on public.mentor_profiles
   for insert to authenticated
-  with check (user_id = auth.uid() and status = 'pending');
+  with check (user_id = auth.uid() and status = 'pending'
+              and exists (select 1 from public.profiles p
+                          where p.id = auth.uid() and p.role = 'mentor'));
 
 drop policy if exists "mentor_profiles_update_own" on public.mentor_profiles;
+-- Mentors manage their own profile but can NEVER change their own status
+-- (approval/rejection is admin-only).
 create policy "mentor_profiles_update_own" on public.mentor_profiles
   for update to authenticated
   using (user_id = auth.uid())
-  with check (user_id = auth.uid());
+  with check (user_id = auth.uid() and public.is_mentor_status_unchanged(mentor_profiles.id, status));
 
 drop policy if exists "mentor_profiles_admin_write" on public.mentor_profiles;
 create policy "mentor_profiles_admin_write" on public.mentor_profiles
@@ -715,7 +760,7 @@ create policy "bookings_update_mentor" on public.bookings
                 where m.id = bookings.mentor_id and m.user_id = auth.uid()))
   with check (exists (select 1 from public.mentor_profiles m
                       where m.id = bookings.mentor_id and m.user_id = auth.uid())
-              and status in ('pending', 'confirmed', 'completed'));
+              and status in ('pending', 'confirmed', 'rejected', 'completed'));
 
 drop policy if exists "bookings_admin_all" on public.bookings;
 create policy "bookings_admin_all" on public.bookings
@@ -739,19 +784,20 @@ create policy "sessions_select_participants" on public.sessions
   );
 
 drop policy if exists "sessions_update_participants" on public.sessions;
-create policy "sessions_update_participants" on public.sessions
+drop policy if exists "sessions_update_mentor_or_admin" on public.sessions;
+-- Only the MENTOR (or admin) may start/complete a session or change its
+-- meeting URL. Students keep read access (meeting link) via the select policy.
+create policy "sessions_update_mentor_or_admin" on public.sessions
   for update to authenticated
   using (exists (select 1 from public.bookings b
                 where b.id = sessions.booking_id
-                  and (b.student_id = auth.uid()
-                       or exists (select 1 from public.mentor_profiles m
-                                  where m.id = b.mentor_id and m.user_id = auth.uid())
+                  and (exists (select 1 from public.mentor_profiles m
+                                where m.id = b.mentor_id and m.user_id = auth.uid())
                        or public.is_admin())))
   with check (exists (select 1 from public.bookings b
                       where b.id = sessions.booking_id
-                        and (b.student_id = auth.uid()
-                             or exists (select 1 from public.mentor_profiles m
-                                        where m.id = b.mentor_id and m.user_id = auth.uid())
+                        and (exists (select 1 from public.mentor_profiles m
+                                      where m.id = b.mentor_id and m.user_id = auth.uid())
                              or public.is_admin())));
 
 -- ============================================================================
@@ -802,11 +848,16 @@ create policy "payments_select_owner" on public.payments
   );
 
 drop policy if exists "payments_insert_student" on public.payments;
+-- Students can only record a PENDING payment for their own booking and the
+-- amount must equal the booking price (no self-declared "paid" rows).
 create policy "payments_insert_student" on public.payments
   for insert to authenticated
   with check (
-    exists (select 1 from public.bookings b
-            where b.id = booking_id and b.student_id = auth.uid())
+    payment_status = 'pending'
+    and exists (select 1 from public.bookings b
+                where b.id = booking_id
+                  and b.student_id = auth.uid()
+                  and b.price = amount)
   );
 
 drop policy if exists "payments_admin" on public.payments;
@@ -872,8 +923,39 @@ where not exists (
 );
 
 -- ----------------------------------------------------------------------------
--- 9. Make the first user an admin (safe, self-service account for prototyping)
+-- 9. Table grants (RLS above still restricts row access per role)
 -- ----------------------------------------------------------------------------
 grant usage on schema public to anon, authenticated;
 grant select on all tables in schema public to anon, authenticated;
 grant insert, update, delete on all tables in schema public to authenticated;
+
+-- ----------------------------------------------------------------------------
+-- 10. Storage — "avatars" bucket + policies
+-- ----------------------------------------------------------------------------
+-- The bucket is created here so a fresh project works out of the box
+-- (no manual Storage setup needed). Public read for <img> usage; writes are
+-- restricted to the authenticated user's own folder {auth.uid()}/...
+insert into storage.buckets (id, name, public)
+values ('avatars', 'avatars', true)
+on conflict (id) do nothing;
+
+drop policy if exists "avatars_public_read" on storage.objects;
+create policy "avatars_public_read" on storage.objects
+  for select to public
+  using (bucket_id = 'avatars');
+
+drop policy if exists "avatars_upload_own_folder" on storage.objects;
+create policy "avatars_upload_own_folder" on storage.objects
+  for insert to authenticated
+  with check (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+
+drop policy if exists "avatars_update_own_folder" on storage.objects;
+create policy "avatars_update_own_folder" on storage.objects
+  for update to authenticated
+  using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text)
+  with check (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+
+drop policy if exists "avatars_delete_own_folder" on storage.objects;
+create policy "avatars_delete_own_folder" on storage.objects
+  for delete to authenticated
+  using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);

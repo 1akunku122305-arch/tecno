@@ -1,5 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Booking, BookingStatus, BookingWithDetails, Session } from "@/types";
+import { friendlyDbError } from "@/lib/utils";
+import { getMentorListItemsByIds } from "./mentor.service";
 
 // ---------------------------------------------------------------------------
 // Booking service — create/read/update bookings + advance sessions.
@@ -44,6 +46,14 @@ export async function createBooking(
   if (mentor.status !== "approved") throw new Error("Mentor belum terverifikasi.");
   if (mentor.price_per_session !== input.price)
     throw new Error("Harga tidak sesuai dengan harga mentor.");
+
+  // The subject must actually be taught by this mentor.
+  const { data: taught } = await supabase
+    .from("mentor_subjects")
+    .select("subject_id")
+    .eq("mentor_id", input.mentorId);
+  if (!(taught ?? []).some((t) => t.subject_id === input.subjectId))
+    throw new Error("Mata kuliah ini tidak diajarkan oleh mentor tersebut.");
 
   const date = new Date(`${input.date}T00:00:00`);
   if (Number.isNaN(date.getTime())) throw new Error("Tanggal tidak valid.");
@@ -110,7 +120,8 @@ export async function updateBookingStatus(
     .eq("id", bookingId)
     .select("*")
     .single();
-  if (error) throw new Error(`Gagal memperbarui booking: ${error.message}`);
+  if (error)
+    throw friendlyDbError(error, "Booking tidak ditemukan atau status tidak dapat diubah.");
   return data as Booking;
 }
 
@@ -124,7 +135,8 @@ export async function getBooking(
     .eq("id", bookingId)
     .maybeSingle();
   if (!data) return null;
-  return hydrateBooking(supabase, data as BookingRow);
+  const [hydrated] = await hydrateBookings(supabase, [data as unknown as BookingRow]);
+  return hydrated ?? null;
 }
 
 /** Bookings for a user's dashboard (student or mentor, resolved by role). */
@@ -154,8 +166,7 @@ export async function getBookingsForDashboard(
   const { data, error } = await query.order("date", { ascending: false }).order("start_time", { ascending: false }).limit(100);
   if (error) throw new Error(`Gagal memuat booking: ${error.message}`);
 
-  const bookings = (data ?? []) as unknown as BookingRow[];
-  return Promise.all(bookings.map((b) => hydrateBooking(supabase, b)));
+  return hydrateBookings(supabase, (data ?? []) as unknown as BookingRow[]);
 }
 
 type BookingRow = Booking & {
@@ -165,41 +176,44 @@ type BookingRow = Booking & {
   subject: { id: string; name: string } | null;
 };
 
-async function hydrateBooking(
+/**
+ * Batch hydration for many bookings at once (fixes the old N+1 pattern where
+ * every booking triggered ~6 extra queries). Exactly two extra round-trips:
+ * one for all related mentors, one for all related students.
+ */
+async function hydrateBookings(
   supabase: SupabaseClient,
-  row: BookingRow
-): Promise<BookingWithDetails> {
-  const mentor = await getMentorForBooking(supabase, row.mentor_id);
-  const student = row.student_id ? await getStudentForBooking(supabase, row.student_id) : null;
-  return {
+  rows: BookingRow[]
+): Promise<BookingWithDetails[]> {
+  if (rows.length === 0) return [];
+
+  const mentorIds = [...new Set(rows.map((r) => r.mentor_id))];
+  const studentIds = [...new Set(rows.map((r) => r.student_id).filter(Boolean))];
+
+  const [mentors, studentsRes] = await Promise.all([
+    getMentorListItemsByIds(supabase, mentorIds),
+    studentIds.length > 0
+      ? supabase
+          .from("profiles")
+          .select("id, role, full_name, avatar_url, university, major, semester, bio, created_at, updated_at")
+          .in("id", studentIds)
+      : Promise.resolve({ data: [] as { id: string }[] }),
+  ]);
+
+  const mentorById = new Map(mentors.map((m) => [m.mentor_id, m]));
+  const studentById = new Map(
+    ((studentsRes.data ?? []) as { id: string }[]).map((p) => [p.id, p as never])
+  );
+
+  return rows.map((row) => ({
     ...row,
-    mentor,
-    student,
+    mentor: mentorById.get(row.mentor_id) ?? null,
+    student: (studentById.get(row.student_id) ?? null) as BookingWithDetails["student"],
     subject: row.subject as BookingWithDetails["subject"],
     session: row.session as BookingWithDetails["session"],
     payment: row.payment as BookingWithDetails["payment"],
     review: row.review as BookingWithDetails["review"],
-  };
-}
-
-async function getMentorForBooking(
-  supabase: SupabaseClient,
-  mentorId: string
-): Promise<BookingWithDetails["mentor"] | null> {
-  const { getMentorListItem } = await import("./mentor.service");
-  return getMentorListItem(supabase, mentorId);
-}
-
-async function getStudentForBooking(
-  supabase: SupabaseClient,
-  studentId: string
-): Promise<BookingWithDetails["student"] | null> {
-  const { data } = await supabase
-    .from("profiles")
-    .select("id, role, full_name, avatar_url, university, major, semester, bio, created_at, updated_at")
-    .eq("id", studentId)
-    .maybeSingle();
-  return (data as BookingWithDetails["student"]) ?? null;
+  }));
 }
 
 // --- Session helpers --------------------------------------------------------
@@ -226,7 +240,7 @@ export async function startSession(
     .eq("booking_id", bookingId)
     .select("*")
     .single();
-  if (error) throw new Error(`Gagal memulai sesi: ${error.message}`);
+  if (error) throw friendlyDbError(error, "Sesi tidak ditemukan atau tidak dapat dimulai.");
   return data as Session;
 }
 
@@ -240,7 +254,7 @@ export async function completeSession(
     .eq("booking_id", bookingId)
     .select("*")
     .single();
-  if (error) throw new Error(`Gagal menyelesaikan sesi: ${error.message}`);
+  if (error) throw friendlyDbError(error, "Sesi tidak ditemukan atau tidak dapat diselesaikan.");
   return data as Session;
 }
 

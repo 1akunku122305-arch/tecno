@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
+import { useSearchParams } from "next/navigation";
 import { registerUser, type AuthFormState } from "@/lib/auth/actions";
 import { Button } from "@/components/ui/button";
 import { FormMessage, Input, Label } from "@/components/ui/form";
@@ -23,7 +24,11 @@ export function RegisterForm() {
     async (_prev: AuthFormState, formData: FormData) => registerUser(formData),
     {} as AuthFormState
   );
-  const [role, setRole] = useState<"student" | "mentor">("student");
+  // Preselect the role from ?role=mentor (landing "Jadi Mentor" CTA).
+  const searchParams = useSearchParams();
+  const [role, setRole] = useState<"student" | "mentor">(
+    searchParams.get("role") === "mentor" ? "mentor" : "student"
+  );
 
   return (
     <form action={action} className="space-y-4 rounded-2xl border border-ink-200/80 bg-white p-6 shadow-sm">

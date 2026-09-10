@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { friendlyDbError } from "@/lib/utils";
 import {
   completeSession,
   createBooking,
@@ -88,8 +89,10 @@ export async function updateMeetingUrlAction(bookingId: string, url: string) {
   const { error } = await supabase
     .from("sessions")
     .update({ meeting_url: url.trim() || null })
-    .eq("booking_id", bookingId);
-  if (error) return { ok: false, error: `Gagal memperbarui link meeting: ${error.message}` };
+    .eq("booking_id", bookingId)
+    .select("booking_id");
+  if (error)
+    return { ok: false, error: friendlyDbError(error, "Sesi tidak ditemukan.").message };
   revalidatePath("/mentor/sessions");
   revalidatePath("/student/sessions");
   return { ok: true };
