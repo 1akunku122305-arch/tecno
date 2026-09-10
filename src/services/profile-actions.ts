@@ -47,13 +47,16 @@ export async function uploadAvatarAction(
 
     // Best-effort: remove the previous avatar object (in the same bucket &
     // the user's own folder) so the bucket doesn't accumulate old uploads.
+    // Supabase public URL format: .../storage/v1/object/public/avatars/<userId>/<file>
     if (previousAvatarUrl) {
-      const marker = `/avatars/public/${user.id}/`;
+      const marker = `/avatars/${user.id}/`;
       const idx = previousAvatarUrl.indexOf(marker);
       if (idx !== -1) {
-        const oldPath = previousAvatarUrl.slice(idx + marker.length);
-        if (oldPath && !oldPath.includes("/")) {
-          await supabase.storage.from("avatars").remove([oldPath]);
+        const filename = previousAvatarUrl.slice(idx + marker.length).split("?")[0];
+        // Guard: filename should be a single file name without path traversal
+        if (filename && !filename.includes("/") && !filename.includes("..")) {
+          const fullOldPath = `${user.id}/${filename}`;
+          await supabase.storage.from("avatars").remove([fullOldPath]);
         }
       }
     }
