@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthContext } from "@/lib/auth/session";
 import { getBookingsForDashboard } from "@/services/booking.service";
-import { getUnreadCount } from "@/services/notification.service";
-import { DashboardShell } from "@/components/dashboard/dashboard-shell";
-import { MENTOR_NAV as NAV } from "@/components/dashboard/nav";
 import { SetupPanel } from "@/components/dashboard/setup-panel";
 import { Badge, EmptyState } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -16,15 +13,7 @@ export const metadata: Metadata = { title: "Mentor Dashboard" };
 export const dynamic = "force-dynamic";
 
 export default async function MentorDashboardPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user?.id ?? "")
-    .maybeSingle();
+  const { supabase, user, profile } = await getAuthContext();
   const { data: mentor } = await supabase
     .from("mentor_profiles")
     .select("*")
@@ -56,14 +45,7 @@ export default async function MentorDashboardPage() {
       : null;
 
   return (
-    <DashboardShell
-      items={NAV}
-      current="dashboard"
-      role="mentor"
-      userName={profile?.full_name}
-      avatarUrl={profile?.avatar_url}
-      unreadNotifications={configured ? await getUnreadCount(supabase, user?.id ?? "") : 0}
-    >
+    <>
       {!configured && <SetupPanel />}
       {configured && (
         <div className="space-y-6">
@@ -183,7 +165,8 @@ export default async function MentorDashboardPage() {
           </div>
         </div>
       )}
-    </DashboardShell>
+
+    </>
   );
 }
 

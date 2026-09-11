@@ -2,6 +2,7 @@
 // Server-side Supabase client (Next.js App Router, cookie-based SSR sessions)
 // ---------------------------------------------------------------------------
 import { createServerClient } from "@supabase/ssr";
+import { cache } from "react";
 import { cookies } from "next/headers";
 
 type CookieToSet = {
@@ -10,7 +11,12 @@ type CookieToSet = {
   options: Record<string, unknown>;
 };
 
-export async function createClient() {
+/**
+ * Cached per-request client — see the Supabase SSR docs. Wrapping in React
+ * `cache()` means a single request (layout + page + actions) shares one client
+ * and only reads cookies once, avoiding duplicate client construction.
+ */
+export const createClient = cache(async () => {
   const cookieStore = await cookies();
 
   return createServerClient(
@@ -34,4 +40,5 @@ export async function createClient() {
       },
     }
   );
-}
+});
+

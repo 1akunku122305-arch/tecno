@@ -2,9 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAdminStats, listBookingsAdmin } from "@/services/admin.service";
-import { getUnreadCount } from "@/services/notification.service";
-import { DashboardShell } from "@/components/dashboard/dashboard-shell";
-import { ADMIN_NAV as NAV } from "@/components/dashboard/nav";
 import { SetupPanel } from "@/components/dashboard/setup-panel";
 import { Card } from "@/components/ui/card";
 import { BOOKING_STATUS_LABEL, timeHM } from "@/lib/utils";
@@ -23,14 +20,6 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user?.id ?? "")
-    .maybeSingle();
 
   const configured = Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -56,14 +45,7 @@ export default async function AdminDashboardPage() {
   ];
 
   return (
-    <DashboardShell
-      items={NAV}
-      current="dashboard"
-      role="admin"
-      userName={profile?.full_name}
-      avatarUrl={profile?.avatar_url}
-      unreadNotifications={configured ? await getUnreadCount(supabase, user?.id ?? "") : 0}
-    >
+    <>
       {!configured && <SetupPanel />}
       {configured && stats && (
         <div className="space-y-6">
@@ -160,6 +142,7 @@ export default async function AdminDashboardPage() {
           </p>
         </div>
       )}
-    </DashboardShell>
+
+    </>
   );
 }

@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { listMentorsForAdmin } from "@/services/admin.service";
-import { getUnreadCount } from "@/services/notification.service";
-import { DashboardShell } from "@/components/dashboard/dashboard-shell";
-import { ADMIN_NAV as NAV } from "@/components/dashboard/nav";
 import { SetupPanel } from "@/components/dashboard/setup-panel";
 import { Card } from "@/components/ui/card";
 import { Avatar } from "@/components/avatar";
@@ -23,14 +20,6 @@ export default async function AdminMentorsPage({
 }) {
   const { status } = await searchParams;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user?.id ?? "")
-    .maybeSingle();
 
   const configured = Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -42,20 +31,13 @@ export default async function AdminMentorsPage({
     : [];
 
   return (
-    <DashboardShell
-      items={NAV}
-      current="mentors"
-      role="admin"
-      userName={profile?.full_name}
-      avatarUrl={profile?.avatar_url}
-      unreadNotifications={configured ? await getUnreadCount(supabase, user?.id ?? "") : 0}
-    >
+    <>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-extrabold text-ink-950">Verifikasi Mentor</h1>
           <p className="mt-1 text-sm text-ink-500">{mentors.length} profil mentor.</p>
         </div>
-        <div className="flex gap-2 text-sm">
+        <div className="flex flex-wrap gap-2 text-sm">
           {[
             { label: "Semua", value: "" },
             { label: "Pending", value: "pending" },
@@ -118,6 +100,7 @@ export default async function AdminMentorsPage({
           ))}
         </ul>
       )}
-    </DashboardShell>
+
+    </>
   );
 }

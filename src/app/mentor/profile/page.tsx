@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
-import { createClient } from "@/lib/supabase/server";
-import { getUnreadCount } from "@/services/notification.service";
+import { getAuthContext } from "@/lib/auth/session";
 import { getCategories, getSubjects } from "@/services/catalog.service";
-import { DashboardShell } from "@/components/dashboard/dashboard-shell";
-import { MENTOR_NAV as NAV } from "@/components/dashboard/nav";
 import { SetupPanel } from "@/components/dashboard/setup-panel";
 import { ProfileForm } from "@/components/profile/profile-form";
 import { MentorProfileEditor } from "@/components/mentor/mentor-profile-editor";
@@ -13,15 +10,7 @@ export const metadata: Metadata = { title: "Profil Mentor" };
 export const dynamic = "force-dynamic";
 
 export default async function MentorProfilePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user?.id ?? "")
-    .maybeSingle();
+  const { supabase, user, profile } = await getAuthContext();
   const { data: mentor } = await supabase
     .from("mentor_profiles")
     .select("*")
@@ -58,14 +47,7 @@ export default async function MentorProfilePage() {
   }
 
   return (
-    <DashboardShell
-      items={NAV}
-      current="profile"
-      role="mentor"
-      userName={profile?.full_name}
-      avatarUrl={profile?.avatar_url}
-      unreadNotifications={configured ? await getUnreadCount(supabase, user?.id ?? "") : 0}
-    >
+    <>
       <div className="mx-auto max-w-3xl space-y-6">
         <div>
           <h1 className="text-2xl font-extrabold text-ink-950">Profil Mentor</h1>
@@ -102,6 +84,7 @@ export default async function MentorProfilePage() {
           <SetupPanel />
         )}
       </div>
-    </DashboardShell>
+
+    </>
   );
 }

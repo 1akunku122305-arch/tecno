@@ -34,7 +34,7 @@ export function MentorStatusButtons({
   }
 
   return (
-    <div className="mt-4 flex gap-2">
+    <div className="mt-4 flex flex-wrap gap-2">
       <button
         onClick={() => act("approve")}
         disabled={pending}

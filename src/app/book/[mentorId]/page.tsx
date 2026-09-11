@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { createClient } from "@/lib/supabase/server";
 import { requireStudent } from "@/lib/auth/guards";
 import { getMentorListItem } from "@/services/mentor.service";
 import { BookingForm } from "@/components/booking/booking-form";
@@ -24,27 +22,19 @@ export default async function BookPage({
   const configured = Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   );
-
-  let supabase: SupabaseClient | null = null;
-  let user: { id: string } | null = null;
-  if (configured) {
-    supabase = await createClient();
-    const ctx = await requireStudent(supabase);
-    user = ctx.user ? { id: ctx.user.id } : null;
-  } else {
+  if (!configured) {
     redirect("/login?next=/book/" + encodeURIComponent(mentorId));
   }
-  if (!user) redirect("/login");
+
+  const { supabase } = await requireStudent();
 
   let mentor = null;
   let error: string | null = null;
 
-  if (configured && supabase) {
-    try {
-      mentor = await getMentorListItem(supabase, mentorId);
-    } catch (e) {
-      error = e instanceof Error ? e.message : "Gagal memuat data.";
-    }
+  try {
+    mentor = await getMentorListItem(supabase, mentorId);
+  } catch (e) {
+    error = e instanceof Error ? e.message : "Gagal memuat data.";
   }
 
   return (

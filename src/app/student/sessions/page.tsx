@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { getRequestUserId } from "@/lib/auth/session";
 import { getBookingsForDashboard } from "@/services/booking.service";
-import { getUnreadCount } from "@/services/notification.service";
-import { DashboardShell } from "@/components/dashboard/dashboard-shell";
-import { STUDENT_NAV as NAV } from "@/components/dashboard/nav";
 import { SetupPanel } from "@/components/dashboard/setup-panel";
 import { Badge, EmptyState } from "@/components/ui/badge";
 import { Avatar } from "@/components/avatar";
@@ -19,22 +17,15 @@ const statusTone = (s?: string) =>
 
 export default async function StudentSessionsPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user?.id ?? "")
-    .maybeSingle();
+  const userId = await getRequestUserId();
 
   const configured = Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   );
 
   let bookings: Awaited<ReturnType<typeof getBookingsForDashboard>> = [];
-  if (configured && user) {
-    bookings = await getBookingsForDashboard(supabase, user.id, "student", [
+  if (configured && userId) {
+    bookings = await getBookingsForDashboard(supabase, userId, "student", [
       "confirmed",
       "completed",
     ]);
@@ -45,14 +36,7 @@ export default async function StudentSessionsPage() {
     .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
 
   return (
-    <DashboardShell
-      items={NAV}
-      current="sessions"
-      role="student"
-      userName={profile?.full_name}
-      avatarUrl={profile?.avatar_url}
-      unreadNotifications={configured ? await getUnreadCount(supabase, user?.id ?? "") : 0}
-    >
+    <>
       <div className="mb-6">
         <h1 className="text-2xl font-extrabold text-ink-950">Sesi Saya</h1>
         <p className="mt-1 text-sm text-ink-500">
@@ -127,6 +111,7 @@ export default async function StudentSessionsPage() {
           ))}
         </ul>
       )}
-    </DashboardShell>
+
+    </>
   );
 }
