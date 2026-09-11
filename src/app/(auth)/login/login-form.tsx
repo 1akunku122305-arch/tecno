@@ -25,7 +25,7 @@ export function LoginForm() {
   const next = useSearchParams().get("next") ?? "";
 
   return (
-    <form action={action} className="space-y-4 rounded-2xl border border-ink-200/80 bg-white p-6 shadow-sm">
+    <form action={action} className="space-y-4 rounded-none border-2 border-ink-950 bg-white p-6 shadow-[4px_4px_0_0_rgba(12,12,10,0.12)]">
       <input type="hidden" name="next" value={next} />
       {state.error && <FormMessage variant="error">{state.error}</FormMessage>}
       {state.info && <FormMessage variant="info">{state.info}</FormMessage>}

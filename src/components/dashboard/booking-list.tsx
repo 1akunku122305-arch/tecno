@@ -42,7 +42,7 @@ export function BookingList({
       {bookings.map((b) => (
         <li
           key={b.id}
-          className="flex flex-col gap-3 rounded-2xl border border-ink-200/80 bg-white p-4 sm:flex-row sm:items-center"
+          className="flex flex-col gap-3 rounded-none border border-ink-200/80 bg-white p-4 sm:flex-row sm:items-center"
         >
           {b.mentor ? (
             <div className="flex min-w-0 flex-1 items-center gap-3">
@@ -82,14 +82,14 @@ export function BookingList({
                 <button
                   onClick={() => onAccept?.(b.id)}
                   disabled={pending}
-                  className="inline-flex h-8 items-center gap-1 rounded-lg bg-emerald-600 px-3 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+                  className="inline-flex h-8 items-center gap-1 rounded-none bg-ink-600 px-3 text-xs font-semibold text-white hover:bg-ink-700 disabled:opacity-50"
                 >
                   <Check className="h-3.5 w-3.5" aria-hidden /> Terima
                 </button>
                 <button
                   onClick={() => onReject?.(b.id)}
                   disabled={pending}
-                  className="inline-flex h-8 items-center gap-1 rounded-lg border border-red-200 px-3 text-xs font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50"
+                  className="inline-flex h-8 items-center gap-1 rounded-none border border-ink-200 px-3 text-xs font-semibold text-ink-600 hover:bg-ink-50 disabled:opacity-50"
                 >
                   <X className="h-3.5 w-3.5" aria-hidden /> Tolak
                 </button>

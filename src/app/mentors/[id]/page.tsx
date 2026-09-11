@@ -54,7 +54,7 @@ export default async function MentorProfilePage({
       </nav>
 
       {error && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <div className="rounded-none border border-ink-200 bg-ink-50 px-4 py-3 text-sm text-ink-800">
           {error}
         </div>
       )}
@@ -74,7 +74,7 @@ export default async function MentorProfilePage({
       {!error && mentor && (
         <>
           {/* Header */}
-          <section className="rounded-3xl border border-ink-200/80 bg-white p-6 sm:p-8">
+          <section className="rounded-none border border-ink-200/80 bg-white p-6 sm:p-8">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
               <Avatar src={mentor.avatar_url} name={mentor.full_name} size={96} />
               <div className="flex-1">
@@ -101,18 +101,18 @@ export default async function MentorProfilePage({
                   ))}
                 </div>
               </div>
-              <div className="rounded-2xl bg-ink-50 p-4 text-center sm:text-right">
+              <div className="rounded-none bg-ink-50 p-4 text-center sm:text-right">
                 <p className="text-2xl font-extrabold text-ink-950">{formatPrice(mentor.price_per_session)}</p>
                 <p className="text-xs text-ink-400">per sesi</p>
                 {mentor.status === "approved" ? (
                   <Link
                     href={`/book/${mentor.mentor_id}`}
-                    className="mt-3 inline-flex h-10 items-center justify-center gap-1.5 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700"
+                    className="mt-3 inline-flex h-10 items-center justify-center gap-1.5 rounded-none bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700"
                   >
                     <BookCheck className="h-4 w-4" aria-hidden /> Booking Sesi
                   </Link>
                 ) : (
-                  <p className="mt-3 text-xs text-amber-600">Belum dapat di-booking (menunggu verifikasi)</p>
+                  <p className="mt-3 text-xs text-ink-600">Belum dapat di-booking (menunggu verifikasi)</p>
                 )}
               </div>
             </div>
@@ -120,7 +120,7 @@ export default async function MentorProfilePage({
 
           <div className="mt-6 grid gap-6 lg:grid-cols-3">
             <div className="space-y-6 lg:col-span-2">
-              <section className="rounded-2xl border border-ink-200/80 bg-white p-6">
+              <section className="rounded-none border border-ink-200/80 bg-white p-6">
                 <h2 className="font-bold text-ink-950">Tentang</h2>
                 <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-ink-600">
                   {mentor.bio || "Mentor belum menulis bio."}
@@ -133,7 +133,7 @@ export default async function MentorProfilePage({
                 </div>
               </section>
 
-              <section className="rounded-2xl border border-ink-200/80 bg-white p-6">
+              <section className="rounded-none border border-ink-200/80 bg-white p-6">
                 <h2 className="font-bold text-ink-950">Bidang yang diajarkan</h2>
                 {subjects.length > 0 ? (
                   <ul className="mt-3 flex flex-wrap gap-2">
@@ -150,7 +150,7 @@ export default async function MentorProfilePage({
                     <h3 className="mt-5 text-sm font-semibold text-ink-800">Topik khusus</h3>
                     <ul className="mt-2 flex flex-wrap gap-2">
                       {topics.slice(0, 12).map((t) => (
-                        <li key={t.id} className="rounded-full border border-ink-200 px-3 py-1 text-xs text-ink-600">
+                        <li key={t.id} className="rounded-none border border-ink-200 px-3 py-1 text-xs text-ink-600">
                           {t.name}
                         </li>
                       ))}
@@ -159,7 +159,7 @@ export default async function MentorProfilePage({
                 )}
               </section>
 
-              <section className="rounded-2xl border border-ink-200/80 bg-white p-6">
+              <section className="rounded-none border border-ink-200/80 bg-white p-6">
                 <h2 className="font-bold text-ink-950">Ulasan dari mahasiswa</h2>
                 {reviews.length > 0 ? (
                   <ul className="mt-4 space-y-4">
@@ -189,7 +189,7 @@ export default async function MentorProfilePage({
             </div>
 
             <aside className="space-y-6">
-              <section className="rounded-2xl border border-ink-200/80 bg-white p-6">
+              <section className="rounded-none border border-ink-200/80 bg-white p-6">
                 <h2 className="flex items-center gap-2 font-bold text-ink-950">
                   <CalendarDays className="h-4 w-4 text-brand-600" aria-hidden /> Jadwal tersedia
                 </h2>
@@ -198,7 +198,7 @@ export default async function MentorProfilePage({
                     {mentor.availability.map((a) => (
                       <li
                         key={a.id}
-                        className="flex items-center justify-between rounded-xl bg-ink-50 px-3 py-2 text-sm"
+                        className="flex items-center justify-between rounded-none bg-ink-50 px-3 py-2 text-sm"
                       >
                         <span className="font-semibold text-ink-800">{dayName(a.day_of_week)}</span>
                         <span className="text-ink-500">{a.start_time.slice(0, 5)}–{a.end_time.slice(0, 5)}</span>
@@ -210,7 +210,7 @@ export default async function MentorProfilePage({
                 )}
               </section>
 
-              <section className="rounded-2xl border border-brand-200 bg-brand-50 p-5 text-sm text-brand-800">
+              <section className="rounded-none border border-brand-200 bg-brand-50 p-5 text-sm text-brand-800">
                 <p className="font-bold">Cara booking</p>
                 <ol className="mt-2 list-inside list-decimal space-y-1 text-brand-900/80">
                   <li>Pilih tanggal & waktu</li>

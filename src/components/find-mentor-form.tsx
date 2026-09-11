@@ -81,19 +81,19 @@ export function FindMentorForm({ categories }: { categories: Category[] }) {
 
   if (!configured) {
     return (
-      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-800">
+      <div className="rounded-none border border-ink-200 bg-ink-50 p-6 text-sm text-ink-800">
         <p className="font-semibold">Supabase belum dikonfigurasi.</p>
         <p className="mt-1">
-          Isi <code className="rounded bg-amber-100 px-1">NEXT_PUBLIC_SUPABASE_URL</code> dan{" "}
-          <code className="rounded bg-amber-100 px-1">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> di{" "}
-          <code className="rounded bg-amber-100 px-1">.env.local</code>, lalu jalankan migration SQL di Supabase.
+          Isi <code className="rounded bg-ink-100 px-1">NEXT_PUBLIC_SUPABASE_URL</code> dan{" "}
+          <code className="rounded bg-ink-100 px-1">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> di{" "}
+          <code className="rounded bg-ink-100 px-1">.env.local</code>, lalu jalankan migration SQL di Supabase.
         </p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={submit} className="space-y-5 rounded-2xl border border-ink-200/80 bg-white p-5 sm:p-6">
+    <form onSubmit={submit} className="space-y-5 rounded-none border border-ink-200/80 bg-white p-5 sm:p-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <Label htmlFor="category">Bidang Akademik</Label>
@@ -157,7 +157,7 @@ export function FindMentorForm({ categories }: { categories: Category[] }) {
                 aria-checked={duration === d}
                 onClick={() => setDuration(d)}
                 className={cn(
-                  "h-11 rounded-xl border text-sm font-semibold transition-colors",
+                  "h-11 rounded-none border text-sm font-semibold transition-colors",
                   duration === d
                     ? "border-brand-500 bg-brand-50 text-brand-700"
                     : "border-ink-200 text-ink-600 hover:border-ink-300"

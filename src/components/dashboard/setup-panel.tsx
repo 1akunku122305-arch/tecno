@@ -11,7 +11,7 @@ export function SetupPanel() {
         Dashboard membutuhkan koneksi ke Supabase. Isi environment variables lalu jalankan migration SQL.
       </Alert>
 
-      <div className="rounded-2xl border border-ink-200/80 bg-white p-6">
+      <div className="rounded-none border border-ink-200/80 bg-white p-6">
         <h2 className="font-bold text-ink-950">Langkah setup</h2>
         <ol className="mt-3 list-inside list-decimal space-y-2 text-sm text-ink-600">
           <li>
@@ -37,7 +37,7 @@ export function SetupPanel() {
             (wajib setiap mengubah <code className="rounded bg-ink-100 px-1.5 py-0.5 text-xs">.env.local</code>)
           </li>
         </ol>
-        <p className="mt-4 rounded-xl bg-ink-50 px-4 py-3 text-xs leading-relaxed text-ink-500">
+        <p className="mt-4 rounded-none bg-ink-50 px-4 py-3 text-xs leading-relaxed text-ink-500">
           Untuk pengujian cepat: nonaktifkan email confirmation di Authentication → Providers → Email,
           dan set role admin pada akun pertama lewat SQL Editor:
           <code className="mt-2 block rounded bg-ink-800 px-3 py-2 text-[11px] text-white">

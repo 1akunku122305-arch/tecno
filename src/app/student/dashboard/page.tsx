@@ -66,7 +66,7 @@ export default async function StudentDashboardPage() {
       {!configured && <SetupPanel />}
       {configured && (
         <div className="space-y-6">
-          <div className="rounded-2xl bg-gradient-to-r from-brand-600 to-brand-800 p-6 text-white sm:p-8">
+          <div className="rounded-none bg-gradient-to-r from-brand-600 to-brand-800 p-6 text-white sm:p-8">
             <h1 className="text-2xl font-extrabold">
               Halo, {profile?.full_name?.split(" ")[0] ?? "Mahasiswa"} 👋
             </h1>
@@ -75,7 +75,7 @@ export default async function StudentDashboardPage() {
             </p>
             <Link
               href="/find-mentor"
-              className="mt-5 inline-flex h-11 items-center gap-2 rounded-xl bg-white px-5 text-sm font-bold text-brand-700 hover:bg-brand-50"
+              className="mt-5 inline-flex h-11 items-center gap-2 rounded-none bg-white px-5 text-sm font-bold text-brand-700 hover:bg-brand-50"
             >
               <Compass className="h-4 w-4" aria-hidden /> Cari Mentor <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
@@ -106,7 +106,7 @@ export default async function StudentDashboardPage() {
               ) : (
                 <ul className="space-y-3">
                   {upcoming.slice(0, 5).map((b) => (
-                    <li key={b.id} className="rounded-2xl border border-ink-200/80 bg-white p-4">
+                    <li key={b.id} className="rounded-none border border-ink-200/80 bg-white p-4">
                       <div className="flex items-center gap-3">
                         <Avatar src={b.mentor?.avatar_url} name={b.mentor?.full_name} size={40} />
                         <div className="min-w-0 flex-1">
@@ -138,7 +138,7 @@ export default async function StudentDashboardPage() {
                     <li key={b.id}>
                       <Link
                         href={`/mentors/${b.mentor_id}`}
-                        className="flex items-center gap-3 rounded-xl border border-ink-200/80 bg-white p-3 hover:border-brand-300"
+                        className="flex items-center gap-3 rounded-none border border-ink-200/80 bg-white p-3 hover:border-brand-300"
                       >
                         <Avatar src={b.mentor?.avatar_url} name={b.mentor?.full_name} size={36} />
                         <div className="min-w-0 flex-1">
@@ -151,7 +151,7 @@ export default async function StudentDashboardPage() {
                 </ul>
               )}
 
-              <div className="mt-4 rounded-2xl border border-brand-200 bg-brand-50 p-4">
+              <div className="mt-4 rounded-none border border-brand-200 bg-brand-50 p-4">
                 <p className="flex items-center gap-1.5 text-sm font-bold text-brand-800">
                   <Sparkles className="h-4 w-4" aria-hidden /> Tips
                 </p>
@@ -178,7 +178,7 @@ function StatCard({
 }) {
   return (
     <Card className="flex items-center gap-4">
-      <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+      <span className="flex h-11 w-11 items-center justify-center rounded-none bg-brand-50 text-brand-600">
         <Icon className="h-5 w-5" aria-hidden />
       </span>
       <div>

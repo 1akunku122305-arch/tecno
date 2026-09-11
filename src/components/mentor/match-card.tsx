@@ -11,7 +11,7 @@ export function MatchCard({ match }: { match: MatchResult }) {
   const nextSlots = m.availability.slice(0, 2);
 
   return (
-    <article className="flex flex-col rounded-2xl border border-ink-200/80 bg-white p-5 transition-shadow hover:shadow-md">
+    <article className="flex flex-col rounded-none border border-ink-900 bg-white p-5 shadow-[4px_4px_0_0_rgba(12,12,10,0.08)] transition-shadow hover:shadow-[6px_6px_0_0_rgba(12,12,10,0.14)]">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <Avatar src={m.avatar_url} name={m.full_name} size={52} />
@@ -27,9 +27,9 @@ export function MatchCard({ match }: { match: MatchResult }) {
             <p className="text-xs text-ink-500">{m.headline ?? (m.major ? `Mentor ${m.major}` : "Mentor Akademik")}</p>
           </div>
         </div>
-        <div className="rounded-xl bg-brand-50 px-2.5 py-1.5 text-center">
-          <p className="text-lg font-extrabold leading-none text-brand-700">{match.score}%</p>
-          <p className="mt-0.5 text-[10px] font-medium text-brand-600">cocok</p>
+        <div className="rounded-none border-2 border-ink-950 bg-ink-950 px-2.5 py-1.5 text-center">
+          <p className="text-lg font-extrabold leading-none text-white">{match.score}%</p>
+          <p className="mt-0.5 text-[10px] font-bold uppercase tracking-wide text-ink-200">cocok</p>
         </div>
       </div>
 
@@ -75,13 +75,13 @@ export function MatchCard({ match }: { match: MatchResult }) {
       <div className="mt-4 grid grid-cols-2 gap-2">
         <Link
           href={`/mentors/${m.mentor_id}`}
-          className="inline-flex h-9 items-center justify-center rounded-lg border border-ink-200 text-sm font-semibold text-ink-800 hover:bg-ink-50"
+          className="inline-flex h-9 items-center justify-center rounded-none border border-ink-950 text-sm font-bold uppercase tracking-wide text-ink-950 hover:bg-ink-100"
         >
           Lihat Profil
         </Link>
         <Link
           href={`/book/${m.mentor_id}?subject_id=${m.subjects[0]?.id ?? ""}&topic=${encodeURIComponent("")}`}
-          className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg bg-brand-600 text-sm font-semibold text-white hover:bg-brand-700"
+          className="inline-flex h-9 items-center justify-center gap-1.5 rounded-none bg-ink-950 text-sm font-bold uppercase tracking-wide text-white hover:bg-ink-800"
         >
           <BookCheck className="h-4 w-4" aria-hidden /> Booking
         </Link>

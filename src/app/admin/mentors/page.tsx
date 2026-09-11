@@ -66,7 +66,7 @@ export default async function AdminMentorsPage({
               key={f.value}
               href={f.value ? `/admin/mentors?status=${f.value}` : "/admin/mentors"}
               className={
-                "rounded-lg px-3 py-2 font-semibold " +
+                "rounded-none px-3 py-2 font-semibold " +
                 ((status ?? "") === f.value ? "bg-ink-900 text-white" : "border border-ink-200 bg-white text-ink-600")
               }
             >
@@ -87,7 +87,7 @@ export default async function AdminMentorsPage({
       {configured && mentors.length > 0 && (
         <ul className="grid gap-4 md:grid-cols-2">
           {mentors.map((m: any) => (
-            <li key={m.id} className="rounded-2xl border border-ink-200/80 bg-white p-5">
+            <li key={m.id} className="rounded-none border border-ink-200/80 bg-white p-5">
               <div className="flex items-start gap-3">
                 <Avatar src={m.profile?.avatar_url} name={m.profile?.full_name} size={44} />
                 <div className="min-w-0 flex-1">
@@ -101,12 +101,12 @@ export default async function AdminMentorsPage({
                 </div>
                 <span
                   className={
-                    "rounded-full px-2.5 py-0.5 text-xs font-semibold " +
+                    "rounded-none px-2.5 py-0.5 text-xs font-semibold " +
                     (m.status === "approved"
-                      ? "bg-emerald-100 text-emerald-800"
+                      ? "bg-ink-100 text-ink-800"
                       : m.status === "rejected"
-                        ? "bg-red-100 text-red-700"
-                        : "bg-amber-100 text-amber-800")
+                        ? "bg-ink-100 text-ink-700"
+                        : "bg-ink-100 text-ink-800")
                   }
                 >
                   {m.status === "approved" ? "Approved" : m.status === "rejected" ? "Ditolak" : "Pending"}

@@ -14,10 +14,10 @@ export const metadata: Metadata = { title: "Booking" };
 export const dynamic = "force-dynamic";
 
 const tone: Record<string, string> = {
-  pending: "bg-amber-100 text-amber-800",
-  confirmed: "bg-emerald-100 text-emerald-800",
+  pending: "bg-ink-100 text-ink-800",
+  confirmed: "bg-ink-100 text-ink-800",
   completed: "bg-brand-100 text-brand-800",
-  rejected: "bg-red-100 text-red-700",
+  rejected: "bg-ink-100 text-ink-700",
   cancelled: "bg-ink-100 text-ink-600",
 };
 
@@ -83,7 +83,7 @@ export default async function AdminBookingsPage() {
                     </td>
                     <td className="px-4 py-3 font-semibold text-ink-900">{formatPrice(b.price)}</td>
                     <td className="px-4 py-3">
-                      <span className={"rounded-full px-2.5 py-0.5 text-xs font-semibold " + (tone[b.status] ?? "bg-ink-100 text-ink-600")}>
+                      <span className={"rounded-none px-2.5 py-0.5 text-xs font-semibold " + (tone[b.status] ?? "bg-ink-100 text-ink-600")}>
                         {BOOKING_STATUS_LABEL[b.status]}
                       </span>
                     </td>

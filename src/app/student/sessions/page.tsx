@@ -76,7 +76,7 @@ export default async function StudentSessionsPage() {
       {configured && ordered.length > 0 && (
         <ul className="space-y-4">
           {ordered.map((b) => (
-            <li key={b.id} className="rounded-2xl border border-ink-200/80 bg-white p-5">
+            <li key={b.id} className="rounded-none border border-ink-200/80 bg-white p-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <Avatar src={b.mentor?.avatar_url} name={b.mentor?.full_name} size={42} />
@@ -107,7 +107,7 @@ export default async function StudentSessionsPage() {
                     href={b.session.meeting_url}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-brand-50 px-3 text-sm font-semibold text-brand-700 hover:bg-brand-100"
+                    className="inline-flex h-9 items-center gap-1.5 rounded-none bg-brand-50 px-3 text-sm font-semibold text-brand-700 hover:bg-brand-100"
                   >
                     <Video className="h-4 w-4" aria-hidden /> Buka Link Meeting
                   </a>

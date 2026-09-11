@@ -3,11 +3,11 @@ import { cn } from "@/lib/utils";
 import { CheckCircle2, CircleAlert, Info, Loader2, XCircle } from "lucide-react";
 
 const tones = {
-  gray: "bg-ink-100 text-ink-700",
-  brand: "bg-brand-100 text-brand-800",
-  green: "bg-emerald-100 text-emerald-800",
-  amber: "bg-amber-100 text-amber-800",
-  red: "bg-red-100 text-red-700",
+  gray: "bg-ink-100 text-ink-900",
+  brand: "bg-ink-950 text-white",
+  green: "bg-white text-ink-950 border border-ink-950",
+  amber: "bg-white text-ink-950 border border-ink-950",
+  red: "bg-ink-950 text-white",
 } as const;
 
 export function Badge({
@@ -22,7 +22,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold",
+        "inline-flex items-center gap-1 rounded-none px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide",
         tones[tone],
         className
       )}
@@ -35,7 +35,7 @@ export function Badge({
 export function Spinner({ label = "Memuat…" }: { label?: string }) {
   return (
     <div className="flex items-center justify-center gap-2 py-12 text-sm text-ink-500" role="status">
-      <Loader2 className="h-5 w-5 animate-spin text-brand-600" aria-hidden />
+      <Loader2 className="h-5 w-5 animate-spin text-ink-950" aria-hidden />
       <span>{label}</span>
     </div>
   );
@@ -57,13 +57,13 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center rounded-2xl border border-dashed border-ink-200 bg-ink-50/50 px-6 py-12 text-center",
+        "flex flex-col items-center justify-center rounded-none border border-dashed border-ink-400 bg-ink-50/50 px-6 py-12 text-center",
         className
       )}
     >
-      {icon && <div className="mb-3 text-ink-300">{icon}</div>}
-      <h3 className="text-base font-semibold text-ink-800">{title}</h3>
-      {description && <p className="mt-1 max-w-sm text-sm text-ink-500">{description}</p>}
+      {icon && <div className="mb-3 text-ink-500">{icon}</div>}
+      <h3 className="text-base font-bold uppercase tracking-wide text-ink-950">{title}</h3>
+      {description && <p className="mt-1 max-w-sm text-sm text-ink-600">{description}</p>}
       {action && <div className="mt-4">{action}</div>}
     </div>
   );
@@ -82,12 +82,12 @@ export function Alert({
     tone === "error" ? XCircle : tone === "success" ? CheckCircle2 : Info;
   const cls =
     tone === "error"
-      ? "border-red-200 bg-red-50 text-red-800"
+      ? "border-ink-950 bg-white text-ink-950"
       : tone === "success"
-        ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-        : "border-brand-200 bg-brand-50 text-brand-800";
+        ? "border-ink-950 bg-white text-ink-950"
+        : "border-ink-950 bg-ink-50 text-ink-950";
   return (
-    <div role="alert" className={cn("flex items-start gap-2.5 rounded-xl border px-4 py-3 text-sm font-medium", cls)}>
+    <div role="alert" className={cn("flex items-start gap-2.5 rounded-none border px-4 py-3 text-sm font-medium", cls)}>
       <Icon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
       <div>
         {title && <p className="font-semibold">{title}</p>}

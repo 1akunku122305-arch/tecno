@@ -90,14 +90,14 @@ export default async function MatchingResultsPage({
           </div>
           <Link
             href="/find-mentor"
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-ink-200 px-4 text-sm font-semibold text-ink-700 hover:bg-ink-50"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-none border border-ink-200 px-4 text-sm font-semibold text-ink-700 hover:bg-ink-50"
           >
             <Settings2 className="h-4 w-4" aria-hidden /> Ubah Kebutuhan
           </Link>
         </div>
 
         {loadError && (
-          <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <div className="mb-6 rounded-none border border-ink-200 bg-ink-50 px-4 py-3 text-sm text-ink-800">
             {loadError}
           </div>
         )}
@@ -110,7 +110,7 @@ export default async function MatchingResultsPage({
             action={
               <Link
                 href="/find-mentor"
-                className="inline-flex h-10 items-center justify-center rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700"
+                className="inline-flex h-10 items-center justify-center rounded-none bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700"
               >
                 Ubah Kebutuhan
               </Link>
@@ -130,7 +130,7 @@ export default async function MatchingResultsPage({
               ))}
             </div>
 
-            <details className="mt-8 rounded-xl border border-ink-200 bg-ink-50/60 px-4 py-3 text-sm text-ink-600">
+            <details className="mt-8 rounded-none border border-ink-200 bg-ink-50/60 px-4 py-3 text-sm text-ink-600">
               <summary className="cursor-pointer font-semibold text-ink-800">
                 Bagaimana skor kecocokan dihitung?
               </summary>

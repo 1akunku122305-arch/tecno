@@ -64,7 +64,7 @@ export default async function AdminUsersPage({
               key={f.value}
               href={f.value ? `/admin/users?role=${f.value}` : "/admin/users"}
               className={
-                "rounded-lg px-3 py-2 font-semibold " +
+                "rounded-none px-3 py-2 font-semibold " +
                 ((role ?? "") === f.value ? "bg-ink-900 text-white" : "bg-white text-ink-600 border border-ink-200")
               }
             >

@@ -46,7 +46,7 @@ export default async function StudentNotificationsPage() {
         </div>
         {notifications.length > 0 && (
           <form action={markNotificationsReadAction}>
-            <button className="rounded-lg border border-ink-200 px-3 py-2 text-xs font-semibold text-ink-600 hover:bg-ink-50">
+            <button className="rounded-none border border-ink-200 px-3 py-2 text-xs font-semibold text-ink-600 hover:bg-ink-50">
               Tandai semua dibaca
             </button>
           </form>
@@ -67,7 +67,7 @@ export default async function StudentNotificationsPage() {
             <li
               key={n.id}
               className={
-                "rounded-xl border bg-white p-4 " +
+                "rounded-none border bg-white p-4 " +
                 (n.is_read ? "border-ink-200/60" : "border-brand-200 bg-brand-50/50")
               }
             >

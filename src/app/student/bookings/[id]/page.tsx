@@ -65,7 +65,7 @@ export default async function BookingDetailPage({
         )}
         {configured && booking && (
           <div className="space-y-6">
-            <div className="rounded-2xl border border-ink-200/80 bg-white p-6">
+            <div className="rounded-none border border-ink-200/80 bg-white p-6">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <h1 className="text-xl font-extrabold text-ink-950">Detail Booking</h1>
@@ -77,32 +77,32 @@ export default async function BookingDetailPage({
               </div>
 
               <dl className="mt-5 grid gap-4 text-sm sm:grid-cols-2">
-                <div className="rounded-xl bg-ink-50 p-3">
+                <div className="rounded-none bg-ink-50 p-3">
                   <dt className="text-xs text-ink-500">Mentor</dt>
                   <dd className="mt-1 flex items-center gap-2 font-semibold text-ink-900">
                     <Avatar src={booking.mentor?.avatar_url} name={booking.mentor?.full_name} size={28} />
                     {booking.mentor?.full_name ?? "-"}
                   </dd>
                 </div>
-                <div className="rounded-xl bg-ink-50 p-3">
+                <div className="rounded-none bg-ink-50 p-3">
                   <dt className="text-xs text-ink-500">Mata Kuliah</dt>
                   <dd className="mt-1 font-semibold text-ink-900">{booking.subject?.name ?? "-"}</dd>
                 </div>
-                <div className="rounded-xl bg-ink-50 p-3">
+                <div className="rounded-none bg-ink-50 p-3">
                   <dt className="text-xs text-ink-500">Topik</dt>
                   <dd className="mt-1 font-semibold text-ink-900">{booking.topic}</dd>
                 </div>
-                <div className="rounded-xl bg-ink-50 p-3">
+                <div className="rounded-none bg-ink-50 p-3">
                   <dt className="text-xs text-ink-500">Jadwal</dt>
                   <dd className="mt-1 font-semibold text-ink-900">
                     {booking.date} · {timeHM(booking.start_time)}–{timeHM(booking.end_time)} ({booking.duration_minutes} mnt)
                   </dd>
                 </div>
-                <div className="rounded-xl bg-ink-50 p-3">
+                <div className="rounded-none bg-ink-50 p-3">
                   <dt className="text-xs text-ink-500">Biaya</dt>
                   <dd className="mt-1 font-semibold text-ink-900">{formatPrice(booking.price)}</dd>
                 </div>
-                <div className="rounded-xl bg-ink-50 p-3">
+                <div className="rounded-none bg-ink-50 p-3">
                   <dt className="text-xs text-ink-500">Catatan</dt>
                   <dd className="mt-1 text-ink-700">{booking.notes || "-"}</dd>
                 </div>
@@ -118,7 +118,7 @@ export default async function BookingDetailPage({
               </div>
             </div>
 
-            <div className="rounded-2xl border border-ink-200/80 bg-white p-6">
+            <div className="rounded-none border border-ink-200/80 bg-white p-6">
               <h2 className="font-bold text-ink-950">Pembayaran</h2>
               {booking.payment ? (
                 <div className="mt-3 grid gap-3 text-sm sm:grid-cols-3">
@@ -136,7 +136,7 @@ export default async function BookingDetailPage({
                   </div>
                 </div>
               ) : (
-                <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                <div className="mt-3 rounded-none border border-ink-200 bg-ink-50 px-4 py-3 text-sm text-ink-800">
                   Payment integration coming soon — pembayaran belum diproses pada MVP.
                 </div>
               )}

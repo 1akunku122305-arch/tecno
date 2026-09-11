@@ -7,14 +7,14 @@ type Size = "sm" | "md" | "lg";
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-brand-600 text-white hover:bg-brand-700 shadow-sm shadow-brand-600/20 disabled:bg-brand-300",
+    "bg-ink-950 text-white hover:bg-ink-800 border border-ink-950 disabled:bg-ink-300",
   secondary:
-    "bg-brand-50 text-brand-700 hover:bg-brand-100 border border-brand-200 disabled:opacity-50",
+    "bg-white text-ink-950 hover:bg-ink-50 border border-ink-950 disabled:opacity-50",
   outline:
-    "border border-ink-200 text-ink-800 hover:bg-ink-50 bg-white disabled:opacity-50",
-  ghost: "text-ink-700 hover:bg-ink-100 disabled:opacity-50",
-  danger: "bg-red-600 text-white hover:bg-red-700 disabled:bg-red-300",
-  success: "bg-emerald-600 text-white hover:bg-emerald-700 disabled:bg-emerald-300",
+    "border border-ink-900 text-ink-900 hover:bg-ink-950 hover:text-white bg-white disabled:opacity-50",
+  ghost: "text-ink-800 hover:bg-ink-100 hover:text-ink-950 disabled:opacity-50",
+  danger: "bg-ink-950 text-white hover:bg-ink-800 border border-ink-950 disabled:bg-ink-300",
+  success: "bg-ink-950 text-white hover:bg-ink-800 border border-ink-950 disabled:bg-ink-300",
   dark: "bg-ink-900 text-white hover:bg-ink-800 disabled:bg-ink-300",
 };
 
@@ -36,7 +36,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       ref={ref}
       disabled={disabled || loading}
       className={cn(
-        "inline-flex items-center justify-center rounded-xl font-semibold transition-colors",
+        "inline-flex items-center justify-center rounded-none font-semibold uppercase tracking-wide transition-colors",
         "disabled:cursor-not-allowed disabled:shadow-none",
         variants[variant],
         sizes[size],
@@ -73,7 +73,7 @@ export function ButtonLink({
     <Link
       href={href}
       className={cn(
-        "inline-flex items-center justify-center rounded-xl font-semibold transition-colors",
+        "inline-flex items-center justify-center rounded-none font-semibold uppercase tracking-wide transition-colors",
         variants[variant],
         sizes[size],
         className

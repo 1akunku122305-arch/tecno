@@ -55,7 +55,7 @@ export default async function BookPage({
       </div>
 
       {error && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <div className="rounded-none border border-ink-200 bg-ink-50 px-4 py-3 text-sm text-ink-800">
           {error}
         </div>
       )}
@@ -71,7 +71,7 @@ export default async function BookPage({
       {!error && mentor && (
         <>
           {mentor.status !== "approved" && (
-            <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            <div className="mb-5 rounded-none border border-ink-200 bg-ink-50 px-4 py-3 text-sm text-ink-800">
               Mentor ini belum terverifikasi dan tidak dapat di-booking.
             </div>
           )}

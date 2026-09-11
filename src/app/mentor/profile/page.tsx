@@ -77,7 +77,7 @@ export default async function MentorProfilePage() {
         {!configured && <SetupPanel />}
         {configured && mentor && (
           <>
-            <section className="rounded-2xl border border-ink-200/80 bg-white p-5 sm:p-6">
+            <section className="rounded-none border border-ink-200/80 bg-white p-5 sm:p-6">
               <h2 className="mb-4 font-bold text-ink-950">Informasi Dasar</h2>
               <ProfileForm
                 name={profile?.full_name ?? ""}
