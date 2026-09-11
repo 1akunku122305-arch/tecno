@@ -77,7 +77,7 @@ export default async function AdminDashboardPage() {
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {cards.map((c) => (
               <Card key={c.label} className="flex items-center gap-3">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-none bg-brand-50 text-brand-600">
                   <c.icon className="h-5 w-5" aria-hidden />
                 </span>
                 <div className="min-w-0">
@@ -126,7 +126,7 @@ export default async function AdminDashboardPage() {
                           {b.date} {timeHM(b.start_time)}
                         </td>
                         <td className="px-4 py-3">
-                          <span className="rounded-full bg-ink-100 px-2 py-0.5 text-xs font-semibold text-ink-700">
+                          <span className="rounded-none bg-ink-100 px-2 py-0.5 text-xs font-semibold text-ink-700">
                             {BOOKING_STATUS_LABEL[b.status]}
                           </span>
                         </td>
@@ -139,13 +139,13 @@ export default async function AdminDashboardPage() {
           </section>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Link href="/admin/mentors" className="rounded-2xl border border-ink-200 bg-white p-5 hover:border-brand-300">
+            <Link href="/admin/mentors" className="rounded-none border border-ink-200 bg-white p-5 hover:border-brand-300">
               <p className="flex items-center gap-2 font-bold text-ink-950">
                 <CheckCircle2 className="h-4 w-4 text-brand-600" aria-hidden /> Verifikasi Mentor
               </p>
               <p className="mt-1 text-sm text-ink-500">{stats.pendingMentors} pengajuan menunggu.</p>
             </Link>
-            <Link href="/admin/categories" className="rounded-2xl border border-ink-200 bg-white p-5 hover:border-brand-300">
+            <Link href="/admin/categories" className="rounded-none border border-ink-200 bg-white p-5 hover:border-brand-300">
               <p className="flex items-center gap-2 font-bold text-ink-950">
                 <FolderKanban className="h-4 w-4 text-brand-600" aria-hidden /> Kelola Katalog
               </p>

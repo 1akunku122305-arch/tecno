@@ -61,7 +61,7 @@ export default async function MentorSessionsPage() {
       {configured && sessions.length > 0 && (
         <ul className="space-y-4">
           {sessions.map((b) => (
-            <li key={b.id} className="rounded-2xl border border-ink-200/80 bg-white p-5">
+            <li key={b.id} className="rounded-none border border-ink-200/80 bg-white p-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <Avatar src={b.student?.avatar_url} name={b.student?.full_name} size={42} />

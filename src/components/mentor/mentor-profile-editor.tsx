@@ -97,7 +97,7 @@ export function MentorProfileEditor({
   return (
     <form onSubmit={saveAll} className="space-y-6">
       {/* Status */}
-      <section className="rounded-2xl border border-ink-200/80 bg-white p-5" id="verifikasi">
+      <section className="rounded-none border border-ink-200/80 bg-white p-5" id="verifikasi">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="font-bold text-ink-950">Status Verifikasi</h2>
@@ -118,7 +118,7 @@ export function MentorProfileEditor({
       </section>
 
       {/* Info mentor */}
-      <section className="rounded-2xl border border-ink-200/80 bg-white p-5 sm:p-6">
+      <section className="rounded-none border border-ink-200/80 bg-white p-5 sm:p-6">
         <h2 className="mb-4 font-bold text-ink-950">Informasi Mentor</h2>
         <div className="space-y-4">
           <div>
@@ -183,7 +183,7 @@ export function MentorProfileEditor({
       </section>
 
       {/* Subjects */}
-      <section className="rounded-2xl border border-ink-200/80 bg-white p-5 sm:p-6">
+      <section className="rounded-none border border-ink-200/80 bg-white p-5 sm:p-6">
         <h2 className="font-bold text-ink-950">Mata Kuliah yang Diajarkan</h2>
         <p className="mt-0.5 text-sm text-ink-500">Pilih lebih dari satu mata kuliah.</p>
         <div className="mt-3 flex flex-wrap gap-2">
@@ -196,7 +196,7 @@ export function MentorProfileEditor({
                 aria-pressed={active}
                 onClick={() => toggleSubject(s.id)}
                 className={cn(
-                  "rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors",
+                  "rounded-none border px-3.5 py-1.5 text-sm font-medium transition-colors",
                   active
                     ? "border-brand-500 bg-brand-50 text-brand-700"
                     : "border-ink-200 text-ink-600 hover:border-ink-300"

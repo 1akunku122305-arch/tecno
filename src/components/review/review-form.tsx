@@ -40,7 +40,7 @@ export function ReviewForm({ bookingId, mentorId }: { bookingId: string; mentorI
   }
 
   return (
-    <form onSubmit={submit} className="space-y-4 rounded-2xl border border-ink-200/80 bg-white p-5 sm:p-6">
+    <form onSubmit={submit} className="space-y-4 rounded-none border border-ink-200/80 bg-white p-5 sm:p-6">
       <div>
         <Label>Rating</Label>
         <div className="flex gap-1" role="radiogroup" aria-label="Rating 1 sampai 5">
@@ -60,7 +60,7 @@ export function ReviewForm({ bookingId, mentorId }: { bookingId: string; mentorI
                 aria-hidden
                 className={cn(
                   "h-7 w-7 transition-colors",
-                  i <= (hover || rating) ? "fill-amber-400 text-amber-400" : "fill-ink-200 text-ink-200"
+                  i <= (hover || rating) ? "fill-ink-400 text-ink-400" : "fill-ink-200 text-ink-200"
                 )}
               />
             </button>

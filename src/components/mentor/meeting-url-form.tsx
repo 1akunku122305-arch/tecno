@@ -44,9 +44,9 @@ export function MeetingUrlForm({
           placeholder="https://meet.google.com/…"
           type="url"
         />
-        {error && <p className="mt-1.5 text-xs font-medium text-red-600">{error}</p>}
+        {error && <p className="mt-1.5 text-xs font-medium text-ink-600">{error}</p>}
         {success && !error && (
-          <p className="mt-1.5 text-xs font-medium text-emerald-600">{success}</p>
+          <p className="mt-1.5 text-xs font-medium text-ink-600">{success}</p>
         )}
       </div>
       <Button type="submit" size="sm" loading={pending}>Simpan</Button>

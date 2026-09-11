@@ -74,7 +74,7 @@ export function ProfileForm({
   }
 
   return (
-    <form onSubmit={submit} className="space-y-5 rounded-2xl border border-ink-200/80 bg-white p-5 sm:p-6">
+    <form onSubmit={submit} className="space-y-5 rounded-none border border-ink-200/80 bg-white p-5 sm:p-6">
       <div className="flex items-center gap-4">
         <Avatar src={avatar} name={values.name} size={64} />
         <div>

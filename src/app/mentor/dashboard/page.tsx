@@ -67,7 +67,7 @@ export default async function MentorDashboardPage() {
       {!configured && <SetupPanel />}
       {configured && (
         <div className="space-y-6">
-          <div className="flex flex-col gap-4 rounded-2xl bg-gradient-to-r from-ink-900 to-ink-800 p-6 text-white sm:flex-row sm:items-center sm:justify-between sm:p-8">
+          <div className="flex flex-col gap-4 rounded-none bg-gradient-to-r from-ink-900 to-ink-800 p-6 text-white sm:flex-row sm:items-center sm:justify-between sm:p-8">
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-2xl font-extrabold">Halo, {profile?.full_name ?? "Mentor"} 👋</h1>
@@ -86,11 +86,11 @@ export default async function MentorDashboardPage() {
               </p>
             </div>
             <div className="flex gap-3">
-              <Link href="/mentor/profile" className="inline-flex h-10 items-center rounded-xl bg-white px-4 text-sm font-bold text-ink-900 hover:bg-ink-100">
+              <Link href="/mentor/profile" className="inline-flex h-10 items-center rounded-none bg-white px-4 text-sm font-bold text-ink-900 hover:bg-ink-100">
                 Edit Profil
               </Link>
               {mentor?.status !== "approved" && (
-                <Link href="/mentor/profile#verifikasi" className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-brand-600 px-4 text-sm font-bold text-white hover:bg-brand-700">
+                <Link href="/mentor/profile#verifikasi" className="inline-flex h-10 items-center gap-1.5 rounded-none bg-brand-600 px-4 text-sm font-bold text-white hover:bg-brand-700">
                   <ShieldCheck className="h-4 w-4" aria-hidden /> Ajukan Verifikasi
                 </Link>
               )}
@@ -128,7 +128,7 @@ export default async function MentorDashboardPage() {
               ) : (
                 <ul className="space-y-3">
                   {pending.slice(0, 5).map((b) => (
-                    <li key={b.id} className="flex items-center gap-3 rounded-2xl border border-ink-200/80 bg-white p-4">
+                    <li key={b.id} className="flex items-center gap-3 rounded-none border border-ink-200/80 bg-white p-4">
                       <Avatar src={b.student?.avatar_url} name={b.student?.full_name} size={40} />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-bold text-ink-950">{b.student?.full_name ?? "Mahasiswa"}</p>
@@ -163,7 +163,7 @@ export default async function MentorDashboardPage() {
               ) : (
                 <ul className="space-y-3">
                   {upcoming.slice(0, 5).map((b) => (
-                    <li key={b.id} className="rounded-2xl border border-ink-200/80 bg-white p-4">
+                    <li key={b.id} className="rounded-none border border-ink-200/80 bg-white p-4">
                       <div className="flex items-center justify-between gap-3">
                         <div className="min-w-0">
                           <p className="truncate text-sm font-bold text-ink-950">{b.topic}</p>
@@ -200,7 +200,7 @@ function StatCard({
 }) {
   return (
     <Card className="flex items-center gap-4">
-      <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+      <span className="flex h-11 w-11 items-center justify-center rounded-none bg-brand-50 text-brand-600">
         <Icon className="h-5 w-5" aria-hidden />
       </span>
       <div>

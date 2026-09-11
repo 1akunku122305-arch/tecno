@@ -47,7 +47,7 @@ export default async function StudentBookingsPage() {
         </div>
         <Link
           href="/find-mentor"
-          className="hidden h-10 items-center rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700 sm:inline-flex"
+          className="hidden h-10 items-center rounded-none bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700 sm:inline-flex"
         >
           + Booking Baru
         </Link>

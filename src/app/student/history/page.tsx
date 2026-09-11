@@ -64,13 +64,13 @@ export default async function StudentHistoryPage() {
           <section>
             <h2 className="mb-3 font-bold text-ink-950">Sesi Selesai</h2>
             {completed.length === 0 ? (
-              <p className="rounded-xl border border-dashed border-ink-200 px-4 py-6 text-center text-sm text-ink-500">
+              <p className="rounded-none border border-dashed border-ink-200 px-4 py-6 text-center text-sm text-ink-500">
                 Belum ada sesi yang selesai.
               </p>
             ) : (
               <ul className="space-y-4">
                 {completed.map((b) => (
-                  <li key={b.id} className="rounded-2xl border border-ink-200/80 bg-white p-5">
+                  <li key={b.id} className="rounded-none border border-ink-200/80 bg-white p-5">
                     <div className="flex items-center gap-3">
                       <Avatar src={b.mentor?.avatar_url} name={b.mentor?.full_name} size={40} />
                       <div className="min-w-0 flex-1">
@@ -79,7 +79,7 @@ export default async function StudentHistoryPage() {
                           {b.subject?.name} · {b.topic} · {b.date} {timeHM(b.start_time)} · {formatPrice(b.price)}
                         </p>
                       </div>
-                      {b.review && <span className="text-sm font-semibold text-emerald-600">✓ {b.review.rating}/5</span>}
+                      {b.review && <span className="text-sm font-semibold text-ink-600">✓ {b.review.rating}/5</span>}
                     </div>
                     {!b.review && (
                       <div className="mt-4 border-t border-ink-100 pt-4">
@@ -97,7 +97,7 @@ export default async function StudentHistoryPage() {
               <h2 className="mb-3 font-bold text-ink-950">Lainnya</h2>
               <ul className="space-y-2">
                 {others.map((b) => (
-                  <li key={b.id} className="flex items-center justify-between rounded-xl border border-ink-200/80 bg-white p-4 text-sm">
+                  <li key={b.id} className="flex items-center justify-between rounded-none border border-ink-200/80 bg-white p-4 text-sm">
                     <div className="min-w-0">
                       <p className="truncate font-semibold text-ink-900">{b.subject?.name} · {b.topic}</p>
                       <p className="text-xs text-ink-500">{b.date} · {BOOKING_STATUS_LABEL[b.status]}</p>

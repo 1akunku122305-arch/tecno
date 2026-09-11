@@ -29,12 +29,12 @@ export function UserRoleSelect({ userId, role }: { userId: string; role: UserRol
         value={role}
         onChange={change}
         disabled={role === "admin" || pending}
-        className="rounded-lg border border-ink-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-ink-800 disabled:opacity-60"
+        className="rounded-none border border-ink-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-ink-800 disabled:opacity-60"
       >
         <option value="student">Mahasiswa</option>
         <option value="mentor">Mentor</option>
       </select>
-      {error && <p className="mt-1 text-[11px] text-red-600">{error}</p>}
+      {error && <p className="mt-1 text-[11px] text-ink-600">{error}</p>}
     </div>
   );
 }

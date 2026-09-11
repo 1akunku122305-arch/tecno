@@ -38,7 +38,7 @@ export function MentorStatusButtons({
       <button
         onClick={() => act("approve")}
         disabled={pending}
-        className="rounded-lg bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 disabled:opacity-50"
+        className="rounded-none bg-ink-600 px-4 py-2 text-xs font-bold text-white hover:bg-ink-700 disabled:opacity-50"
       >
         ✓ Approve
       </button>
@@ -46,7 +46,7 @@ export function MentorStatusButtons({
         <button
           onClick={() => act("reset")}
           disabled={pending}
-          className="rounded-lg border border-ink-200 px-4 py-2 text-xs font-bold text-ink-600 hover:bg-ink-50 disabled:opacity-50"
+          className="rounded-none border border-ink-200 px-4 py-2 text-xs font-bold text-ink-600 hover:bg-ink-50 disabled:opacity-50"
         >
           Kembalikan ke Pending
         </button>
@@ -54,12 +54,12 @@ export function MentorStatusButtons({
         <button
           onClick={() => act("reject")}
           disabled={pending}
-          className="rounded-lg border border-red-200 px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 disabled:opacity-50"
+          className="rounded-none border border-ink-200 px-4 py-2 text-xs font-bold text-ink-600 hover:bg-ink-50 disabled:opacity-50"
         >
           ✕ Tolak
         </button>
       )}
-      {error && <p className="self-center text-xs text-red-600">{error}</p>}
+      {error && <p className="self-center text-xs text-ink-600">{error}</p>}
     </div>
   );
 }

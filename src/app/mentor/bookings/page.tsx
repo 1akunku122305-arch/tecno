@@ -61,7 +61,7 @@ export default async function MentorBookingsPage() {
       {configured && bookings.length > 0 && (
         <ul className="space-y-3">
           {bookings.map((b) => (
-            <li key={b.id} className="flex flex-col gap-3 rounded-2xl border border-ink-200/80 bg-white p-4 sm:flex-row sm:items-center">
+            <li key={b.id} className="flex flex-col gap-3 rounded-none border border-ink-200/80 bg-white p-4 sm:flex-row sm:items-center">
               <div className="flex min-w-0 flex-1 items-center gap-3">
                 <Avatar src={b.student?.avatar_url} name={b.student?.full_name} size={42} />
                 <div className="min-w-0">
@@ -77,7 +77,7 @@ export default async function MentorBookingsPage() {
                 <span>· {formatPrice(b.price)}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="rounded-full bg-ink-100 px-2.5 py-0.5 text-xs font-semibold text-ink-700">
+                <span className="rounded-none bg-ink-100 px-2.5 py-0.5 text-xs font-semibold text-ink-700">
                   {BOOKING_STATUS_LABEL[b.status]}
                 </span>
                 {b.status === "pending" && <AcceptRejectButtons bookingId={b.id} />}

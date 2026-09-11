@@ -35,7 +35,7 @@ export default async function FindMentorPage() {
         </div>
 
         {loadError && (
-          <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <div className="mb-6 rounded-none border border-ink-200 bg-ink-50 px-4 py-3 text-sm text-ink-800">
             {loadError}
           </div>
         )}

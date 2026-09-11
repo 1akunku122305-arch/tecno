@@ -74,7 +74,7 @@ export function BookingForm({
   return (
     <div className="space-y-6">
       {/* Review panel */}
-      <div className="flex items-center gap-3 rounded-2xl border border-ink-200 bg-ink-50/60 p-4">
+      <div className="flex items-center gap-3 rounded-none border border-ink-200 bg-ink-50/60 p-4">
         <Avatar src={mentor.avatar_url} name={mentor.full_name} size={48} />
         <div className="min-w-0 flex-1">
           <p className="flex items-center gap-1.5 font-bold text-ink-950">
@@ -97,7 +97,7 @@ export function BookingForm({
       {error && <FormMessage variant="error">{error}</FormMessage>}
 
       {step === 1 ? (
-        <form onSubmit={goReview} className="space-y-5 rounded-2xl border border-ink-200/80 bg-white p-5">
+        <form onSubmit={goReview} className="space-y-5 rounded-none border border-ink-200/80 bg-white p-5">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <Label htmlFor="subject">Mata Kuliah</Label>
@@ -119,7 +119,7 @@ export function BookingForm({
                     aria-checked={duration === d}
                     onClick={() => setDuration(d)}
                     className={cn(
-                      "h-11 rounded-xl border text-sm font-semibold transition-colors",
+                      "h-11 rounded-none border text-sm font-semibold transition-colors",
                       duration === d
                         ? "border-brand-500 bg-brand-50 text-brand-700"
                         : "border-ink-200 text-ink-600 hover:border-ink-300"
@@ -170,7 +170,7 @@ export function BookingForm({
           </div>
         </form>
       ) : (
-        <div className="rounded-2xl border border-ink-200/80 bg-white p-5 sm:p-6">
+        <div className="rounded-none border border-ink-200/80 bg-white p-5 sm:p-6">
           <h2 className="text-lg font-bold text-ink-950">Ringkasan Booking</h2>
           <dl className="mt-4 space-y-3 text-sm">
             <div className="flex justify-between border-b border-ink-100 pb-2">
@@ -217,7 +217,7 @@ export function BookingForm({
       )}
 
       {/* Mentor availability hint */}
-      <details className="rounded-xl border border-ink-200 bg-ink-50/60 px-4 py-3 text-sm text-ink-600">
+      <details className="rounded-none border border-ink-200 bg-ink-50/60 px-4 py-3 text-sm text-ink-600">
         <summary className="cursor-pointer font-semibold text-ink-800">Jadwal rutin mentor</summary>
         {mentor.availability.length > 0 ? (
           <ul className="mt-3 grid gap-1.5 sm:grid-cols-2">

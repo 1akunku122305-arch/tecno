@@ -49,7 +49,7 @@ export function AvailabilityManager({ slots }: { slots: MentorAvailability[] }) 
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
-      <form onSubmit={add} className="space-y-4 rounded-2xl border border-ink-200/80 bg-white p-5">
+      <form onSubmit={add} className="space-y-4 rounded-none border border-ink-200/80 bg-white p-5">
         <h2 className="font-bold text-ink-950">Tambah Slot Jadwal</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
@@ -73,7 +73,7 @@ export function AvailabilityManager({ slots }: { slots: MentorAvailability[] }) 
         <Button type="submit" loading={pending}>Tambah Jadwal</Button>
       </form>
 
-      <div className="rounded-2xl border border-ink-200/80 bg-white p-5">
+      <div className="rounded-none border border-ink-200/80 bg-white p-5">
         <h2 className="font-bold text-ink-950">Jadwal Saat Ini</h2>
         {slots.length === 0 ? (
           <p className="mt-3 text-sm text-ink-500">
@@ -82,7 +82,7 @@ export function AvailabilityManager({ slots }: { slots: MentorAvailability[] }) 
         ) : (
           <ul className="mt-3 space-y-2">
             {slots.map((s) => (
-              <li key={s.id} className="flex items-center justify-between rounded-xl bg-ink-50 px-3 py-2.5">
+              <li key={s.id} className="flex items-center justify-between rounded-none bg-ink-50 px-3 py-2.5">
                 <div>
                   <p className="text-sm font-semibold text-ink-900">
                     {dayName(s.day_of_week)} · {s.start_time.slice(0, 5)}–{s.end_time.slice(0, 5)}
@@ -101,7 +101,7 @@ export function AvailabilityManager({ slots }: { slots: MentorAvailability[] }) 
                   </label>
                   <button
                     onClick={() => remove(s.id)}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-red-500 hover:bg-red-50"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-none text-ink-500 hover:bg-ink-50"
                     aria-label={`Hapus jadwal ${dayName(s.day_of_week)}`}
                   >
                     <Trash2 className="h-4 w-4" aria-hidden />

@@ -11,7 +11,7 @@ export function Stars({ rating, className }: { rating?: number | null; className
           aria-hidden
           className={cn(
             "h-3.5 w-3.5",
-            i <= Math.round(value) ? "fill-amber-400 text-amber-400" : "fill-ink-200 text-ink-200"
+            i <= Math.round(value) ? "fill-ink-950 text-ink-950" : "fill-ink-200 text-ink-200"
           )}
         />
       ))}

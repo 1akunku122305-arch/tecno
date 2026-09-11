@@ -6,7 +6,7 @@ import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site"
 // Keeps `npm run build` reliable in restricted networks and on Vercel.
 
 export const viewport: Viewport = {
-  themeColor: "#1b63f5",
+  themeColor: "#f7f5ef",
   width: "device-width",
   initialScale: 1,
 };
