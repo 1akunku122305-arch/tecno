@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { logoutUser } from "@/lib/auth/actions";
 import { Avatar } from "@/components/avatar";
 import { Logo } from "@/components/logo";
@@ -15,7 +18,6 @@ export interface NavItem {
 
 export function DashboardShell({
   items,
-  current,
   role,
   userName,
   avatarUrl,
@@ -23,13 +25,18 @@ export function DashboardShell({
   children,
 }: {
   items: NavItem[];
-  current: string;
   role: "student" | "mentor" | "admin";
   userName?: string | null;
   avatarUrl?: string | null;
   unreadNotifications: number;
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const current =
+    items.find(
+      (item) => pathname === item.href || pathname.startsWith(`${item.href}/`)
+    )?.key ?? items[0]?.key;
+
   return (
     <div className="min-h-screen bg-paper">
       {/* Desktop sidebar */}
@@ -114,7 +121,7 @@ export function DashboardShell({
 
       {/* Mobile nav */}
       <nav
-        className="sticky top-14 z-20 flex gap-1 overflow-x-auto border-b-2 border-ink-950 bg-white px-2 py-2 lg:hidden"
+        className="no-scrollbar sticky top-14 z-20 flex gap-1 overflow-x-auto border-b-2 border-ink-950 bg-white px-2 py-2 lg:hidden"
         aria-label="Navigasi dashboard mobile"
       >
         {items.map((item) => (

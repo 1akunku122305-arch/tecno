@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { getNotifications, getUnreadCount } from "@/services/notification.service";
+import { getRequestUserId } from "@/lib/auth/session";
+import { getNotifications } from "@/services/notification.service";
 import { markNotificationsReadAction } from "@/services/review-actions";
-import { DashboardShell } from "@/components/dashboard/dashboard-shell";
-import { ADMIN_NAV as NAV } from "@/components/dashboard/nav";
 import { SetupPanel } from "@/components/dashboard/setup-panel";
 import { EmptyState } from "@/components/ui/badge";
 import { formatDateTime } from "@/lib/utils";
@@ -14,31 +13,16 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminNotificationsPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user?.id ?? "")
-    .maybeSingle();
+  const userId = await getRequestUserId();
 
   const configured = Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   );
-  const notifications = configured && user ? await getNotifications(supabase, user.id) : [];
-  const unread = configured ? await getUnreadCount(supabase, user?.id ?? "") : 0;
+  const notifications = configured && userId ? await getNotifications(supabase, userId) : [];
 
   return (
-    <DashboardShell
-      items={NAV}
-      current="notifications"
-      role="admin"
-      userName={profile?.full_name}
-      avatarUrl={profile?.avatar_url}
-      unreadNotifications={unread}
-    >
-      <div className="mb-6 flex items-center justify-between">
+    <>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-extrabold text-ink-950">Notifikasi</h1>
           <p className="mt-1 text-sm text-ink-500">Notifikasi untuk admin.</p>
@@ -74,6 +58,7 @@ export default async function AdminNotificationsPage() {
           ))}
         </ul>
       )}
-    </DashboardShell>
+
+    </>
   );
 }

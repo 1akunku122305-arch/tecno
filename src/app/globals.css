@@ -43,6 +43,7 @@ body {
   font-family: var(--font-sans);
   background-color: var(--color-paper);
   color: #1a1916;
+  overflow-wrap: break-word;
 }
 
 /* Aged paper grain — subtle noise over the whole page */
@@ -80,6 +81,25 @@ body::before {
 input[type="date"],
 input[type="time"] {
   color-scheme: light;
+}
+
+/* iOS Safari auto-zooms when a focused form control is smaller than 16px —
+   keep the brand's compact look on desktop but bump controls to 16px on phones. */
+@media (max-width: 40rem) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* Hide scrollbars on the horizontally scrollable dashboard nav */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 /* Newspaper helpers */

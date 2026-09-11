@@ -1,38 +1,19 @@
 import { redirect } from "next/navigation";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import type { UserRole } from "@/types";
+import { getAuthContext, type AuthContext } from "./session";
+
+export { getAuthContext } from "./session";
 
 /**
- * Server helper: get the signed-in user + their profile role.
- * Returns { user: null, profile: null } when signed out (callers decide).
+ * Require a signed-in user with the given role. Uses the cached auth context
+ * so the layout guard and page share a single getUser + profile lookup per
+ * request. Returns the context so callers can reuse supabase/user/profile.
  */
-export async function getSessionUser(supabase: SupabaseClient) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+async function requireRole(role: UserRole): Promise<AuthContext> {
+  const ctx = await getAuthContext();
 
-  if (!user) return { user: null, profile: null as null };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, role, full_name, avatar_url, university, major, semester, bio")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  return { user, profile };
-}
-
-export async function requireUser(supabase: SupabaseClient) {
-  const ctx = await getSessionUser(supabase);
   if (!ctx.user) redirect("/login");
-  return ctx;
-}
 
-export async function requireRole(
-  supabase: SupabaseClient,
-  role: UserRole
-) {
-  const ctx = await requireUser(supabase);
   if (!ctx.profile || ctx.profile.role !== role) {
     // If a signed-in user has NO profile row (trigger edge case) send them to
     // the landing page instead of /login — redirecting back to /login would
@@ -40,17 +21,18 @@ export async function requireRole(
     const fallback = ctx.profile ? `/${ctx.profile.role}/dashboard` : "/";
     redirect(fallback);
   }
+
   return ctx;
 }
 
-export async function requireStudent(supabase: SupabaseClient) {
-  return requireRole(supabase, "student");
+export function requireStudent() {
+  return requireRole("student");
 }
 
-export async function requireMentor(supabase: SupabaseClient) {
-  return requireRole(supabase, "mentor");
+export function requireMentor() {
+  return requireRole("mentor");
 }
 
-export async function requireAdmin(supabase: SupabaseClient) {
-  return requireRole(supabase, "admin");
+export function requireAdmin() {
+  return requireRole("admin");
 }

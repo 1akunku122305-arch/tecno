@@ -107,7 +107,7 @@ export default async function MentorProfilePage({
                 {mentor.status === "approved" ? (
                   <Link
                     href={`/book/${mentor.mentor_id}`}
-                    className="mt-3 inline-flex h-10 items-center justify-center gap-1.5 rounded-none bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700"
+                    className="mt-3 inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-none bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700 sm:w-auto"
                   >
                     <BookCheck className="h-4 w-4" aria-hidden /> Booking Sesi
                   </Link>

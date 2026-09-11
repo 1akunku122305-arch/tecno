@@ -14,17 +14,38 @@ function isProtectedPath(pathname: string): boolean {
 }
 
 export async function middleware(request: NextRequest) {
-  const { response, user } = await updateSession(request);
   const { pathname } = request.nextUrl;
 
-  if (!user && isProtectedPath(pathname)) {
+  // Public pages (landing, search, mentor profiles, auth) don't need a session
+  // check — skip the Supabase round-trip entirely so they stay fast.
+  if (!isProtectedPath(pathname)) {
+    return NextResponse.next();
+  }
+
+  const { response, user } = await updateSession(request);
+
+  if (!user) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("next", pathname);
     return NextResponse.redirect(url);
   }
 
-  return response;
+  // Forward the authenticated user id to server components via a request
+  // header, so pages can query their data without a second auth round-trip.
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-user-id", user.id);
+
+  const next = NextResponse.next({ request: { headers: requestHeaders } });
+
+  // Preserve any session-refresh cookies set by updateSession.
+  response.headers.forEach((value, key) => {
+    if (key.toLowerCase() === "set-cookie") {
+      next.headers.append("set-cookie", value);
+    }
+  });
+
+  return next;
 }
 
 export const config = {

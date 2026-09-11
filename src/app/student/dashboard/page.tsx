@@ -1,9 +1,6 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthContext } from "@/lib/auth/session";
 import { getBookingsForDashboard } from "@/services/booking.service";
-import { getUnreadCount } from "@/services/notification.service";
-import { DashboardShell } from "@/components/dashboard/dashboard-shell";
-import { STUDENT_NAV as NAV } from "@/components/dashboard/nav";
 import { SetupPanel } from "@/components/dashboard/setup-panel";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/badge";
@@ -21,15 +18,7 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function StudentDashboardPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user?.id ?? "")
-    .maybeSingle();
+  const { supabase, user, profile } = await getAuthContext();
 
   const configured = Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -55,14 +44,7 @@ export default async function StudentDashboardPage() {
     .slice(0, 4);
 
   return (
-    <DashboardShell
-      items={NAV}
-      current="dashboard"
-      role="student"
-      userName={profile?.full_name}
-      avatarUrl={profile?.avatar_url}
-      unreadNotifications={configured ? await getUnreadCount(supabase, user?.id ?? "") : 0}
-    >
+    <>
       {!configured && <SetupPanel />}
       {configured && (
         <div className="space-y-6">
@@ -163,7 +145,8 @@ export default async function StudentDashboardPage() {
           </div>
         </div>
       )}
-    </DashboardShell>
+
+    </>
   );
 }
 

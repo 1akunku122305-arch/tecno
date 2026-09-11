@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { getRequestUserId } from "@/lib/auth/session";
 import { getBooking } from "@/services/booking.service";
-import { getUnreadCount } from "@/services/notification.service";
-import { DashboardShell } from "@/components/dashboard/dashboard-shell";
-import { STUDENT_NAV as NAV } from "@/components/dashboard/nav";
 import { SetupPanel } from "@/components/dashboard/setup-panel";
 import { Avatar } from "@/components/avatar";
 import { Badge, EmptyState } from "@/components/ui/badge";
@@ -23,35 +21,21 @@ export default async function BookingDetailPage({
 }) {
   const { id } = await params;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user?.id ?? "")
-    .maybeSingle();
+  const userId = await getRequestUserId();
 
   const configured = Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   );
 
   let booking = null;
-  if (configured && user) {
+  if (configured && userId) {
     const b = await getBooking(supabase, id);
     // security: only owner (RLS also enforces)
-    if (b && b.student_id === user.id) booking = b;
+    if (b && b.student_id === userId) booking = b;
   }
 
   return (
-    <DashboardShell
-      items={NAV}
-      current="bookings"
-      role="student"
-      userName={profile?.full_name}
-      avatarUrl={profile?.avatar_url}
-      unreadNotifications={configured ? await getUnreadCount(supabase, user?.id ?? "") : 0}
-    >
+    <>
       <div className="mx-auto max-w-3xl">
         <nav className="mb-4 text-sm text-ink-500" aria-label="Breadcrumb">
           <Link href="/student/bookings" className="hover:text-brand-600">Booking Saya</Link>
@@ -151,6 +135,7 @@ export default async function BookingDetailPage({
           </div>
         )}
       </div>
-    </DashboardShell>
+
+    </>
   );
 }

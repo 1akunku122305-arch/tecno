@@ -41,7 +41,7 @@ export function MatchCard({ match }: { match: MatchResult }) {
         {m.subjects.length > 2 && <Badge tone="gray">+{m.subjects.length - 2} lagi</Badge>}
       </div>
 
-      <div className="mt-3 flex items-center gap-3 text-xs text-ink-600">
+      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-600">
         <span className="inline-flex items-center gap-1">
           <Stars rating={m.avg_rating} />
           {m.avg_rating ? <b>{m.avg_rating.toFixed(1)}</b> : <span className="text-ink-400">Belum ada rating</span>}

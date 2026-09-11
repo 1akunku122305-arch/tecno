@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { getUnreadCount } from "@/services/notification.service";
-import { DashboardShell } from "@/components/dashboard/dashboard-shell";
-import { MENTOR_NAV as NAV } from "@/components/dashboard/nav";
+import { getRequestUserId } from "@/lib/auth/session";
 import { SetupPanel } from "@/components/dashboard/setup-panel";
 import { EmptyState } from "@/components/ui/badge";
 import { Avatar } from "@/components/avatar";
@@ -15,18 +13,11 @@ export const dynamic = "force-dynamic";
 
 export default async function MentorReviewsPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user?.id ?? "")
-    .maybeSingle();
+  const userId = await getRequestUserId();
   const { data: mentor } = await supabase
     .from("mentor_profiles")
     .select("id")
-    .eq("user_id", user?.id ?? "")
+    .eq("user_id", userId ?? "")
     .maybeSingle();
 
   const configured = Boolean(
@@ -54,14 +45,7 @@ export default async function MentorReviewsPage() {
     : null;
 
   return (
-    <DashboardShell
-      items={NAV}
-      current="reviews"
-      role="mentor"
-      userName={profile?.full_name}
-      avatarUrl={profile?.avatar_url}
-      unreadNotifications={configured ? await getUnreadCount(supabase, user?.id ?? "") : 0}
-    >
+    <>
       <div className="mb-6">
         <h1 className="text-2xl font-extrabold text-ink-950">Review</h1>
         <p className="mt-1 text-sm text-ink-500">
@@ -98,6 +82,7 @@ export default async function MentorReviewsPage() {
           ))}
         </ul>
       )}
-    </DashboardShell>
+
+    </>
   );
 }
