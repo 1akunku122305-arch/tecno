@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { withTimeout, isTimeoutError } from "@/lib/with-timeout";
 import { findMentorMatches } from "@/services/matching.service";
 import { getCategories, getSubjectById } from "@/services/catalog.service";
 import { MatchCard } from "@/components/mentor/match-card";
@@ -58,17 +59,23 @@ export default async function MatchingResultsPage({
   if (configured) {
     try {
       const supabase = await createClient();
-      const [result, subject, categories] = await Promise.all([
-        findMentorMatches(supabase, criteria),
-        criteria.subject_id ? getSubjectById(supabase, criteria.subject_id) : Promise.resolve(null),
-        getCategories(supabase),
-      ]);
+      const [result, subject, categories] = await withTimeout(
+        Promise.all([
+          findMentorMatches(supabase, criteria),
+          criteria.subject_id ? getSubjectById(supabase, criteria.subject_id) : Promise.resolve(null),
+          getCategories(supabase),
+        ])
+      );
       matches = result.matches;
       subjectName = subject?.name ?? null;
       categoryName =
         categories.find((c) => c.id === criteria.category_id)?.name ?? null;
     } catch (e) {
-      loadError = e instanceof Error ? e.message : "Gagal memuat hasil.";
+      loadError = isTimeoutError(e)
+        ? "Koneksi ke database lambat (timeout). Muat ulang halaman untuk mencoba lagi."
+        : e instanceof Error
+          ? e.message
+          : "Gagal memuat hasil.";
     }
   } else {
     loadError = "Supabase belum dikonfigurasi.";

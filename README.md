@@ -241,13 +241,29 @@ where id = (select id from auth.users where email = 'admin@mentora.id');
 
 1. Push repo ke GitHub.
 2. Vercel → **New Project** → import repo.
-3. Tambahkan environment variables:
-   `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
-   `NEXT_PUBLIC_SITE_URL` (URL Vercel).
+3. Tambahkan environment variables (scope **Production** — dan Preview bila
+   ingin preview deployment ikut berfungsi):
+   `NEXT_PUBLIC_SUPABASE_URL` (= `https://<ref>.supabase.co`, tanpa spasi),
+   `NEXT_PUBLIC_SUPABASE_ANON_KEY` (kunci **anon**, bukan `service_role`),
+   `NEXT_PUBLIC_SITE_URL` (URL Vercel, mis. `https://xxx.vercel.app`).
+   Salin persis dari Supabase Dashboard → Project Settings → API.
 4. Deploy (framework auto-detected: Next.js). Build sudah terverifikasi
-   `npm run build` ✓.
+   `npm run build` ✓. Setiap mengganti env var → **Redeploy** agar berlaku.
 5. Update Supabase Auth URL Configuration dengan URL Vercel + redirect
    `/reset-password`.
+6. Verifikasi cepat: buka `https://<app>.vercel.app/api/health` — harus
+   `"status":"ok"` dan `"supabase":"configured"`. Nilai `"missing"` /
+   `"placeholder"` berarti env var belum benar (halaman tetap tampil 200,
+   hanya data DB yang kosong + pesan ramah).
+
+> **"Application error … Digest" di Vercel?** Itu halaman error generik Next.js
+> saat server melempar exception / kehabisan waktu eksekusi (limit 10 detik di
+> paket Hobby). Penyebab paling umum: (a) deployment lama — pastikan deploy
+> terbaru dari `main` berstatus **Ready**; (b) Supabase lambat/tidak reachable
+> (mis. project **Paused** di free tier — resume di dashboard Supabase); (c) env
+> var salah/placeholder. Baca log persisnya di Vercel → Project → **Logs**
+> (cari `FUNCTION_INVOCATION_TIMEOUT` atau pesan error). Sejak perbaikan ini,
+> query publik dibatasi 5 detik dan selalu degradasi ke pesan ramah, bukan 500.
 
 ---
 

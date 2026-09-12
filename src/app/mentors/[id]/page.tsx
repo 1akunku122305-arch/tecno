@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { withTimeout, isTimeoutError } from "@/lib/with-timeout";
 import { getMentorDetail, getMentorSubjects } from "@/services/mentor.service";
 import { Avatar } from "@/components/avatar";
 import { Badge, EmptyState } from "@/components/ui/badge";
@@ -30,16 +31,22 @@ export default async function MentorProfilePage({
 
   if (configured && supabase) {
     try {
-      const [detail, subjRes] = await Promise.all([
-        getMentorDetail(supabase, id),
-        getMentorSubjects(supabase, id),
-      ]);
+      const [detail, subjRes] = await withTimeout(
+        Promise.all([
+          getMentorDetail(supabase, id),
+          getMentorSubjects(supabase, id),
+        ])
+      );
       mentor = detail.mentor;
       topics = detail.topics;
       reviews = detail.reviews;
       subjects = subjRes;
     } catch (e) {
-      error = e instanceof Error ? e.message : "Gagal memuat data.";
+      error = isTimeoutError(e)
+        ? "Koneksi ke database lambat (timeout). Muat ulang halaman untuk mencoba lagi."
+        : e instanceof Error
+          ? e.message
+          : "Gagal memuat data.";
     }
   } else {
     error = "Supabase belum dikonfigurasi.";

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getCategories } from "@/services/catalog.service";
 import { createClient } from "@/lib/supabase/server";
+import { withTimeout, isTimeoutError } from "@/lib/with-timeout";
 import { FindMentorForm } from "@/components/find-mentor-form";
 import { LandingNavbar } from "@/components/landing/navbar";
 import { Footer } from "@/components/landing/sections";
@@ -15,9 +16,13 @@ export default async function FindMentorPage() {
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     try {
       const supabase = await createClient();
-      categories = await getCategories(supabase);
+      categories = await withTimeout(getCategories(supabase));
     } catch (e) {
-      loadError = e instanceof Error ? e.message : "Gagal memuat data.";
+      loadError = isTimeoutError(e)
+        ? "Koneksi ke database lambat (timeout). Muat ulang halaman untuk mencoba lagi."
+        : e instanceof Error
+          ? e.message
+          : "Gagal memuat data.";
     }
   } else {
     loadError = "Supabase belum dikonfigurasi.";

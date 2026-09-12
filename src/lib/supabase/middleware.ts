@@ -44,10 +44,27 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  // IMPORTANT: do not run code between createServerClient and auth.getUser()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // IMPORTANT: do not run code between createServerClient and auth.getUser().
+  // Race the session lookup against a timer so a hanging Supabase project
+  // degrades to "not logged in" (redirect to /login) instead of blowing past
+  // Vercel's serverless execution limit with an "Application error / Digest".
+  const getUser = supabase.auth.getUser();
+  getUser.then(
+    () => {},
+    () => {}
+  );
+  let user: Awaited<typeof getUser>["data"]["user"] = null;
+  try {
+    const { data } = (await Promise.race([
+      getUser,
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("auth-timeout")), 6000)
+      ),
+    ])) as Awaited<typeof getUser>;
+    user = data.user;
+  } catch {
+    user = null;
+  }
 
   return { response, user };
 }
